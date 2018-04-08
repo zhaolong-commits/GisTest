@@ -1,0 +1,5 @@
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+NetConnection.Connect.Success
+rtmp连接成功
+execute RTMPRPC pkg:GisCoordinateService, method:getAllProvincialIds, args:

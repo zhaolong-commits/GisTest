@@ -1,0 +1,9 @@
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+NetConnection.Connect.Success
+rtmp连接成功
+execute RTMPRPC pkg:GisCoordinateService, method:getAllProvincialIds, args:
+转换级别为:4,经纬度为:55.7765730186677,  67.5
+当前区域开始的坐标点：67.5,55.7765730186677
+当前区域结束的坐标点:90,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:67.5,90,40.979898069620134,55.7765730186677

@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   initialize="windowedapplication1_initializeHandler(event)"
+					   xmlns:arcGis="arcGis.*"
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)"
+					   >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.layers.TiledMapServiceLayer;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.utils.StringUtil;
+			
+			import Config.LargeDataAreaConfigManager;
+			import Config.MapConfig;
+			import Config.MapConfigManager;
+			import Config.PathManager;
+			
+			import Utils.CoordinateUtil;
+			import Utils.GisUtil;
+			import Utils.LogEvent;
+			import Utils.LogManager;
+			
+			import manager.FileManager;
+			import manager.NodeAndLineManager;
+			import manager.RTMPRpcManager;
+			
+			import parseData.DataUtil;
+			import parseData.MethodManager;
+			import parseData.ParseGisData;
+			protected function windowedapplication1_initializeHandler(event:FlexEvent):void
+			{
+				createLogText();
+				//初始化日志
+				LogManager.getInstance().addEventListener(LogEvent.LOG_EVENT,  omLogMsg);			
+				//全局自动最大化
+				maximize();
+				
+				var file : File = File.applicationDirectory.resolvePath("config.xml");
+				var content : String;
+				if( file.exists ){
+					var fileStream : FileStream = new FileStream();
+					fileStream.open(file,FileMode.READ);
+					content = fileStream.readUTFBytes(fileStream.bytesAvailable);
+					fileStream.close();
+				}
+				if( content ){
+					PathManager.getInstance().parseConfig(content);
+				}
+				//加载地图级别信息配置文件
+				var file2:File = new File(File.applicationDirectory.resolvePath("mapConfig.xml").nativePath);
+				if(file2.exists){
+					var fileStream2:FileStream = new FileStream();
+					fileStream2.open(file2,FileMode.READ);
+					var xmlContent:String = fileStream2.readUTFBytes(fileStream2.bytesAvailable);
+					fileStream2.close();
+					
+					MapConfigManager.getInstance().parseMapConfig(xmlContent);
+				}
+				//加载需要特殊处理的文件
+				var file3 : File = new File(File.applicationDirectory.resolvePath("LargeDataAreaConfig.xml").nativePath);
+				if( file3.exists ){
+					var fileStream3 : FileStream = new FileStream();
+					fileStream3.open(file3,FileMode.READ);
+					var xmlContent2:String = fileStream3.readUTFBytes(fileStream3.bytesAvailable);
+					fileStream3.close();
+					
+					LargeDataAreaConfigManager.getInstance().parseConfig(xmlContent2);
+				}
+				//连接远程rpc
+				doRpcServce();
+				
+				NodeAndLineManager.getInstance().gisMap = myArcGis;
+				MethodManager.getInstance().gisMap = myArcGis;
+				FileManager.getInstance().gisMap = myArcGis;
+				
+				var time : Number = Number(PathManager.getInstance().getValue("manyTime"));
+
+				if( time == 4 || time == 16 || time == 64 || time == 128 ){
+					manyTime = MethodManager.getInstance().manyLoadTime = myArcGis.manyTime = time;
+				}else{
+					LogManager.getInstance().onLogMessage("manyTime加载不符合规则，需要是4,16,64,128！");
+				}
+				
+				doInit();
+			}
+			
+			private function createLogText():void{
+				var date : Date = new Date();
+				var dateFor : DateFormatter = new DateFormatter();
+				dateFor.formatString = "MM-DD HH：NN";
+				var dateString : String = dateFor.format(date);
+				var logFileDir : File = new File(File.applicationDirectory.resolvePath("Log").nativePath); 
+				if( logFileDir.exists == false ){
+					logFileDir.createDirectory();
+				}
+				logFile = new File(logFileDir.nativePath+"/"+dateString+" log.txt");
+			}
+			
+			private var _manyTime : Number;
+
+			public function get manyTime():Number
+			{
+				return _manyTime;
+			}
+
+			public function set manyTime(value:Number):void
+			{
+				_manyTime = value;
+				createManyImage();
+			}
+			private var imageArr : Array;
+			
+			//创建Image数组
+			private function createManyImage():void{
+				var sqrt : Number = Math.sqrt(_manyTime);
+				var singleMargin : Number = 256/sqrt;
+				imageArr = new Array();
+				for( var i :int = 0;i < sqrt;i++ ){
+					for( var j : int = 0;j < sqrt;j++ ){
+						var image : Image = new Image();
+						image.x = 0 + j * singleMargin;
+						image.y = 0 + i * singleMargin;
+						image.width = image.height = singleMargin;
+						imageArea.addChild(image);
+						imageArr.push(image);
+					}
+				}
+				myArcGis.imageArr = imageArr;
+				myArcGis.addEventListener("dividedSaveSuccessed",dividedSaveSuccessedFun);
+			}
+			
+			private function doInit():void{
+				myArcGis.getMapLayer();
+//				myArcGis.image = testImage;
+				myArcGis.addEventListener("currentPrvinceSuccessed",startNextProvince);
+				//根据行列获取坐标点
+				var dd:Array = GisUtil.getCenterLngLatOfGridandZooms(376,160,9);
+				trace(dd)
+				//根据坐标点获取行列
+				dd = GisUtil.getGridsOfZooms(84.375,55.7765730186677,9);
+				trace(dd)	
+				_myCanvas.graphics.clear();
+				_myCanvas.graphics.lineStyle(1,0xff0000,1);
+				_myCanvas.graphics.moveTo(512,0);
+				_myCanvas.graphics.lineTo(512,1024);
+				
+				_myCanvas.graphics.moveTo(0,512);
+				_myCanvas.graphics.lineTo(1024,512);
+				
+				_myCanvas.graphics.moveTo(512+256,512);
+				_myCanvas.graphics.lineTo(512+256,1024);
+				
+				_myCanvas.graphics.moveTo(512,768);
+				_myCanvas.graphics.lineTo(768,768);
+				
+				_myCanvas.graphics.endFill();				
+				
+			}
+			
+			private function doRpcServce():void{
+				var url:String = PathManager.getInstance().getValue("endPoint");
+				if( StringUtil.trim(url) != "" ){
+					RTMPRpcManager.getInstance().getConnect(url);
+				}else{
+					LogManager.getInstance().onLogMessage("服务器路径设置错误！");
+				}
+			}
+			
+			protected function drawGis():void
+			{
+				myArcGis.level = Number(_mapLevel.text);
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(myArcGis.level)){
+					
+					if( LargeDataAreaConfigManager.getInstance().largeDataAreaConfig.hasOwnProperty(myArcGis.level) ){
+						var largeConfig : Object = LargeDataAreaConfigManager.getInstance().largeDataAreaConfig[myArcGis.level];
+						if( largeConfig.hasOwnProperty("block") ){
+							manyTime = MethodManager.getInstance().manyLoadTime = myArcGis.manyTime = largeConfig.block;
+						}	
+					}
+					
+					var config:Object = MapConfig.LEVEL_DATAS[myArcGis.level];
+					/*					var lat:Number = config.lat;
+					var lon:Number =  config.lon;*/
+					
+					var dd:Array = GisUtil.getCenterLngLatOfGridandZooms(config.beginCol,config.beginRow,Number(_mapLevel.text));
+					var lat:Number = dd[1];
+					var lon:Number = dd[0];
+					//设置地图中心
+					myArcGis.center = CoordinateUtil.jingwei2MoQia(lat,lon);//39.8085272540,116.5649253075)// 54.6992335285,85.9570312500);
+					LogManager.getInstance().onLogMessage("转换级别为:"+myArcGis.level +",经纬度为:"+lat+",  "+lon);
+					
+					myArcGis.scrapImage();
+					
+//					createManyImage();
+//					getProvinceData();
+				}
+				else{
+					Alert.show("配置文件没有配置该级别地图"); 
+				}
+			}
+			private var provinceIndex : Number = 0;
+			
+			private function startNextProvince(e:Event):void{
+//				myArcGis.level = 0;
+				(myArcGis.getLayer("base") as TiledMapServiceLayer).refresh();
+//				myArcGis.level = parseInt(_mapLevel.text);
+				provinceIndex++;
+				drawGis();
+			}
+			//加载省数据
+			private function getProvinceData():void{
+				var provinceData : ArrayCollection = MethodManager.getInstance().provinceArr;
+				if( provinceData && provinceData.length > 0 ){
+					if( provinceIndex < provinceData.length){
+						getOneProvince(provinceData[provinceIndex].id);
+						LogManager.getInstance().onLogMessage(provinceData[provinceIndex].name);
+					}
+				}else{
+					Alert.show("省ID数据为null，程序停止!!"); 
+				}
+			}
+			
+			private function getOneProvince(provinceID:String):void{
+				ParseGisData.getAllProvincialPolygonIds(provinceID,getProvinceIDSuccessed);
+			}
+/*			private function getProvinceIDSuccessed(lineIDArr : ArrayCollection):void{
+				if( lineIDArr == null || lineIDArr.length<=0 ){
+					LogManager.getInstance().onLogMessage("获取的省的边界线线ID为null");
+				}else{
+					LogManager.getInstance().onLogMessage("获取的省的边界线条数："+lineIDArr.length);
+					for(var i : int = 0; i < lineIDArr.length ;i++){
+						ParseGisData.getProvincialLinePointById(lineIDArr[i].id,getLinseSuccessed);
+					}
+				}
+			}*/
+			/**
+			 * 获取边线成功回调函数2
+			 */
+			private function getProvinceIDSuccessed(lineArr : ArrayCollection):void{
+				var eventName : String = "addProvince";
+				if( lineArr ){
+					LogManager.getInstance().onLogMessage("当前省的边界线条数："+lineArr.length);
+				}
+				DataUtil.getInstance().addEventListener(eventName,addProvinceSuccessed);
+				DataUtil.getInstance().getDataAndDrawLine(lineArr,ParseGisData.getProvincialLinePointById,NodeAndLineManager.getInstance(),eventName,"添加省界");
+			}
+			private function addProvinceSuccessed(e:Event):void{
+				DataUtil.getInstance().removeEventListener("addProvince",addProvinceSuccessed);
+				setTimeout(myArcGis.scrapImage,3000);
+			}
+			
+			private function getLinseSuccessed(pointArr : ArrayCollection):void{
+				if( pointArr && pointArr.length > 0 ){
+					NodeAndLineManager.getInstance().addBoundary(pointArr);
+				}
+			}
+			private var logNum : Number = 0;
+			private function omLogMsg(event:LogEvent):void{
+				trace(event.msg);
+				logNum++;
+				if( logNum%50 == 0 ){
+					_logTextArea.text = "";
+				}
+				_logTextArea.text+=(event.msg+"\n");
+				_logTextArea.verticalScrollPosition = _logTextArea.maxVerticalScrollPosition;
+				writeLogToLocalFile(event.msg);
+			}
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+					MethodManager.getInstance().getAllProvincialIds();
+			}
+			
+			private function dividedSaveSuccessedFun(e:Event):void{
+				setTimeout(setImage,3000);
+			}
+			
+			private function setImage():void{
+				FileManager.getInstance().saveImage(imageArea,0,0);
+				for each(var item : Image in imageArr){
+					item.source = null;
+				}
+			}
+			
+			private var logFile : File;
+			
+			private function writeLogToLocalFile(message : String):void{
+				var fs1 : FileStream = new FileStream();
+				try{
+					fs1.open(logFile,FileMode.READ);
+					if( fs1.bytesAvailable >= 10485760 ){
+						var fileByteArr : ByteArray = new ByteArray();
+						fs1.readBytes(fileByteArr,0,fs1.bytesAvailable);
+						var resultByteArr : ByteArray = new ByteArray();
+						resultByteArr.writeBytes(fileByteArr,5242880,(fileByteArr.length-5242880));
+						fs1.close();
+						var fsWrite : FileStream = new FileStream();
+						try{
+							fsWrite.open(logFile,FileMode.WRITE);
+							fsWrite.writeBytes(resultByteArr,0,resultByteArr.length);	
+						}catch(e:Error){
+							trace(e.message);
+						}finally{
+							fsWrite.close();
+						}
+					}
+				}catch(e:Error){
+					trace(e.message);
+				}finally{
+					fs1.close();
+				}
+				
+				var fs : FileStream = new FileStream();
+				try{	
+					fs.open(logFile,FileMode.APPEND);
+					fs.writeUTFBytes(message+"\r\n");
+				}catch(e:Error){
+					trace(e.message);
+				}finally{
+					fs.close();
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout paddingLeft="20"/>
+	</s:layout>
+	<s:HGroup width="100%" height="30" verticalAlign="middle">
+		<s:Label text="地图级别:"/>
+		<s:TextInput  text="7" id="_mapLevel" restrict="0-9"/>
+		<s:Button label="开始抓图" id="allBorder" click="drawGis()"/>
+	</s:HGroup>
+	<s:BorderContainer width="100%" height="100%" borderColor="0x000000">
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		<mx:Canvas id="_myCanvas" width="1024" height="1024" borderStyle="none">
+			<arcGis:ArcGisMap id="myArcGis" width="1024" height="1024">
+				
+			</arcGis:ArcGisMap>
+		</mx:Canvas>
+		<mx:TextArea width="400" height="100%" id="_logTextArea" fontFamily="宋体"  fontSize="14"/>
+		<mx:Canvas id="imageArea" width="256" height="256"/>
+	</s:BorderContainer>
+</s:WindowedApplication>

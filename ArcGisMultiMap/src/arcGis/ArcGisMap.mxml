@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<esri:Map xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		load="maploadHandler(event)"
+		attributionVisible="false"
+		logoVisible="false"
+		multiTouchRotationEnabled="false"
+		scaleBarVisible="false"
+		zoomSliderVisible="false"
+		mapNavigationEnabled="false"
+		zoomEnd="map1_zoomEndHandler(event)"
+		panEnd="map1_panEndHandler(event)"
+		xmlns:esri="http://www.esri.com/2008/ags" xmlns:gis="cn.showclear.gis.*" xmlns:gis1="cn.road.gis.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.images.JPGEncoder;
+			import com.esri.ags.events.LayerEvent;
+			import com.esri.ags.events.MapEvent;
+			import com.esri.ags.events.PanEvent;
+			import com.esri.ags.events.ZoomEvent;
+			import com.esri.ags.layers.GraphicsLayer;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.controls.Alert;
+			
+			import Config.MapConfig;
+			import Config.PathManager;
+			
+			import GisLayer.GoogleMapLayer;
+			
+			import Utils.CoordinateUtil;
+			import Utils.GisUtil;
+			import Utils.LogManager;
+
+			//背景地图
+			private var baseLayer : GoogleMapLayer;
+			
+			private var colorLayer : GraphicsLayer;
+			
+			//省边界层
+			private var provinceBorderLayer : GoogleMapLayer;
+			//城市边界层
+			private var cityBoundaryLayer : GoogleMapLayer;
+			//县边界层
+			private var countyBorderLayer : GoogleMapLayer;
+			
+			//高速路层
+			private var heightWayLayer : GoogleMapLayer;
+			//国道路层
+			private var nationalHeightWayLayer : GoogleMapLayer;
+			//省道层
+			private var provincialHighwayLayer : GoogleMapLayer;
+			//城际快线层
+			private var expresswayLayer : GoogleMapLayer;
+			//县道层
+			private var CountyHighwayLayer :GoogleMapLayer;
+			//铁路层
+			private var railwayLayer : GoogleMapLayer;
+			
+			//站点以及城市层
+//			private var SiteAndCityLayer : GoogleMapLayer;
+			//省会
+			private var CapitalLayer : GoogleMapLayer;
+			//城市
+			private var CityLayer : GoogleMapLayer;
+			//区
+			private var AreaLayer : GoogleMapLayer;
+			//县
+			private var CountyLayer : GoogleMapLayer;
+			//乡镇
+			private var TownLayer : GoogleMapLayer;
+			//街道
+			private var StreetLayer : GoogleMapLayer;
+			//火车站点
+			private var SiteLayer : GoogleMapLayer;
+			//飞机场
+			private var AirPortLayer : GoogleMapLayer;
+			
+			public function getMapLayer():void{
+				//基础的地图类
+				baseLayer = new GoogleMapLayer();
+				var type : String = PathManager.getInstance().getValue("pictureType");
+				if( type == null ){
+					baseLayer.pictureType = "jpg";
+				}else{
+					baseLayer.pictureType = type;
+				}
+				baseLayer.gisDir = PathManager.getInstance().getValue("baseMap");
+				addLayer(baseLayer,0);
+				
+				colorLayer = new GraphicsLayer();
+				colorLayer.addEventListener(LayerEvent.LOAD,loadEvent);
+				addLayer(colorLayer,1);
+				
+				//省边界层
+				provinceBorderLayer = new GoogleMapLayer();
+//				provinceBorderLayer.gisDir = PathManager.getInstance().getValue("provinceBorder");
+				provinceBorderLayer.gisDir = PathManager.getInstance().getValue("layer1");
+				addLayer(provinceBorderLayer,2);
+				//城市边界层
+				cityBoundaryLayer = new GoogleMapLayer();
+//				cityBoundaryLayer.gisDir = PathManager.getInstance().getValue("cityBorder");
+				cityBoundaryLayer.gisDir = PathManager.getInstance().getValue("layer2");
+				addLayer(cityBoundaryLayer,3);
+				//县边界层
+				countyBorderLayer = new GoogleMapLayer();
+//				countyBorderLayer.gisDir = PathManager.getInstance().getValue("countyBorder");
+				countyBorderLayer.gisDir = PathManager.getInstance().getValue("layer3");
+				addLayer(countyBorderLayer,4);
+				
+				
+				//高速路层
+				heightWayLayer = new GoogleMapLayer();
+//				heightWayLayer.gisDir = PathManager.getInstance().getValue("heightWay");
+				heightWayLayer.gisDir = PathManager.getInstance().getValue("layer4");
+				addLayer(heightWayLayer,5);
+				
+				//国道路层
+				nationalHeightWayLayer = new GoogleMapLayer();
+//				nationalHeightWayLayer.gisDir = PathManager.getInstance().getValue("nationalHeightWay");
+				nationalHeightWayLayer.gisDir = PathManager.getInstance().getValue("layer5");
+				addLayer(nationalHeightWayLayer,6);
+				
+				//省道路层
+				provincialHighwayLayer = new GoogleMapLayer();
+//				provincialHighwayLayer.gisDir = PathManager.getInstance().getValue("provincialHighway");
+				provincialHighwayLayer.gisDir = PathManager.getInstance().getValue("layer6");
+				addLayer(provincialHighwayLayer,7);
+				//城市快客线
+				expresswayLayer = new GoogleMapLayer();
+//				expresswayLayer.gisDir = PathManager.getInstance().getValue("expressway");
+				expresswayLayer.gisDir = PathManager.getInstance().getValue("layer7");
+				addLayer(expresswayLayer,8);
+				//县道
+				CountyHighwayLayer = new GoogleMapLayer();
+//				CountyHighwayLayer.gisDir = PathManager.getInstance().getValue("CountyHighway");
+				CountyHighwayLayer.gisDir = PathManager.getInstance().getValue("layer8");
+				addLayer(CountyHighwayLayer,9);
+				//铁路线
+				railwayLayer = new GoogleMapLayer();
+//				railwayLayer.gisDir = PathManager.getInstance().getValue("railway");
+				railwayLayer.gisDir = PathManager.getInstance().getValue("layer9");
+				addLayer(railwayLayer,10);
+				
+				//省会
+				CapitalLayer = new GoogleMapLayer();
+//				CapitalLayer.gisDir = PathManager.getInstance().getValue("Capital");
+				CapitalLayer.gisDir = PathManager.getInstance().getValue("layer10");
+				addLayer(CapitalLayer,11);
+				//城市
+				CityLayer = new GoogleMapLayer();
+//				CityLayer.gisDir = PathManager.getInstance().getValue("City");
+				CityLayer.gisDir = PathManager.getInstance().getValue("layer11");
+				addLayer(CityLayer,12);
+				//区
+				AreaLayer = new GoogleMapLayer();
+//				AreaLayer.gisDir = PathManager.getInstance().getValue("Area");
+				AreaLayer.gisDir = PathManager.getInstance().getValue("layer12");
+				addLayer(AreaLayer,13);
+				//县
+				CountyLayer = new GoogleMapLayer();
+//				CountyLayer.gisDir = PathManager.getInstance().getValue("County");
+				CountyLayer.gisDir = PathManager.getInstance().getValue("layer13");
+				addLayer(CountyLayer,14);
+				//乡镇
+				TownLayer = new GoogleMapLayer();
+//				TownLayer.gisDir = PathManager.getInstance().getValue("Town");
+				TownLayer.gisDir = PathManager.getInstance().getValue("layer14");
+				addLayer(TownLayer,15);
+				//街道
+				StreetLayer = new GoogleMapLayer();
+//				StreetLayer.gisDir = PathManager.getInstance().getValue("Street");
+				StreetLayer.gisDir = PathManager.getInstance().getValue("layer15");
+				addLayer(StreetLayer,16);
+				//火车站
+				SiteLayer = new GoogleMapLayer();
+//				SiteLayer.gisDir = PathManager.getInstance().getValue("Site");
+				SiteLayer.gisDir = PathManager.getInstance().getValue("layer16");
+				addLayer(SiteLayer,17);
+				//飞机场
+				AirPortLayer = new GoogleMapLayer();
+//				AirPortLayer.gisDir = PathManager.getInstance().getValue("AirPort");
+				AirPortLayer.gisDir = PathManager.getInstance().getValue("layer17");
+				addLayer(AirPortLayer,18);
+			}
+//			private var timer:Timer = new Timer(1000);
+			
+			public var currentCol:Number = 376; //列
+			public var currentRow:Number = 160;//行
+			
+			private var beginCol:Number = 376;
+			private var beginRow:Number = 160;
+			
+			private var endCol:Number = 440//453;
+			private var endRow:Number = 239;
+			
+			private var isAllComplete : Boolean = false;
+			
+			public function scrapImage():void{
+				if( isAllComplete == false ){
+					callLater(scrapImage);
+					return;
+				}
+				isAllComplete = false;
+				
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(this.level)){
+					var configData:Object = MapConfig.LEVEL_DATAS[this.level];
+					this.beginCol = configData["beginCol"];
+					this.beginRow = configData["beginRow"];
+					
+					this.endCol = configData["endCol"];
+					this.endRow = configData["endRow"];
+
+					this.currentCol = this.beginCol;
+					this.currentRow = this.beginRow;
+					
+					setTimeout(function test():void{
+						drawBackground();
+						saveImage();			
+					},3000);
+
+//					LogManager.getInstance().onLogMessage("beginCol="+beginCol+",beginRow="+beginRow+",endCol="+endCol+",endRow="+endRow+",currentCol="+currentCol+",currentRow="+currentRow);
+				}
+				else{
+					Alert.show("配置文件没有配置改级别地图"); 
+					return;
+				}
+				
+//				this.timer.start();
+			}
+			protected function maploadHandler(event:MapEvent):void
+			{
+				this.level=0;	//设置级别
+//				timer.addEventListener(TimerEvent.TIMER,onTimerEventHandler);
+			}
+			private function onTimerEventHandler(e:TimerEvent):void{
+				saveImage();
+			}
+			private var basePath:String = "mapImages";
+			
+			private function saveImage():void{
+				
+				var bitmapData:BitmapData = new BitmapData(256,256,false);
+				var matrix:Matrix = new Matrix();
+				matrix.translate(-512,-512);
+				bitmapData.draw(this,matrix);
+				
+				var encoder:JPGEncoder = new JPGEncoder();
+				var bytes:ByteArray = encoder.encode(bitmapData);
+				var resultAddress : String = PathManager.getInstance().getValue("destination");
+				var file:File;
+				if( resultAddress ){
+					try{
+						file = new File(resultAddress+File.separator+basePath+File.separator+this.level+File.separator+currentCol+File.separator+currentRow+".jpg");
+					}catch(e:Error){
+						LogManager.getInstance().onLogMessage("生成图片的路径错误！！！");
+						return;
+					}
+				}else{
+					try{
+						file = new File(File.desktopDirectory.resolvePath(basePath+File.separator+this.level+File.separator+currentCol+File.separator+currentRow+".jpg").nativePath);
+					}catch(e:Error){
+						LogManager.getInstance().onLogMessage("生成图片的路径错误！！！");
+						return;
+					}
+				}
+				//trace(file.nativePath)
+				if( file == null ){
+					LogManager.getInstance().onLogMessage("生成图片的路径错误！！！");
+				}else{
+					LogManager.getInstance().onLogMessage("保存的图片为:"+file.nativePath);
+					var fileStream:FileStream = new FileStream();
+					fileStream.open(file,FileMode.WRITE);
+					fileStream.writeBytes(bytes,0,bytes.bytesAvailable);
+					fileStream.close();
+					
+					newMoveTile();
+				}
+			}
+			private var isNext:Boolean = false;
+			private var horDirect:String = "right";
+			
+			private var startTime : Number;
+			private var endTime : Number;
+			
+			private function newMoveTile():void{	
+				if(currentRow > endRow){
+//					this.timer.stop();
+					return;
+				}
+//				this.timer.start();
+				
+				if(isNext){
+					if(horDirect == "left" ){
+						this.panLeft();
+						startTime = new Date().getTime();
+						currentCol--;
+						isNext = false;
+						return;
+					}
+					if(horDirect == "right" ){
+						this.panRight()
+						startTime = new Date().getTime();
+						currentCol++;
+						isNext = false;
+						return;
+					}	
+				}
+				
+				if(currentCol >= endCol && horDirect == "right"){
+					this.panDown();
+					startTime = new Date().getTime();
+					currentRow++;
+					horDirect = "left";
+					isNext = true;
+					return;
+				}
+				if(currentCol <= beginCol && horDirect == "left" ){
+					this.panDown();
+					startTime = new Date().getTime();
+					currentRow++;
+					horDirect = "right";
+					isNext = true;
+					return;
+				}
+				
+				if(horDirect == "right"){
+					this.panRight();
+					startTime = new Date().getTime();
+					currentCol++;
+				}
+				
+				if(horDirect == "left"){
+					this.panLeft();
+					startTime = new Date().getTime();
+					currentCol--;
+				}
+			}
+			
+			/**
+			 *  层加载成功的时候派发事件
+			 */
+			private function loadEvent(e:LayerEvent):void{
+//				drawBackground();
+			}
+			/**
+			 * 地图移动(左右上下)的时候派发的事件 
+			 */
+			protected function map1_panEndHandler(event:PanEvent):void
+			{
+				endTime = new Date().getTime();
+				if( (endTime - startTime) > 1000  ){
+					
+				}
+				if( beginRow <= currentRow && currentRow <= endRow && beginCol <= currentCol && currentCol<= endCol ){
+					drawBackground();
+					setTimeout(saveImage,100);
+				}else{
+					LogManager.getInstance().onLogMessage("该级别的图截取完了。。。。。。。。。。。。。。。。。。。。。。。。。。。。\n\n\n\n\n");
+				}
+//				saveImage();
+			}
+			/**
+			 *	地图改变层级结束的时候派发事件 
+			 */
+			protected function map1_zoomEndHandler(event:ZoomEvent):void
+			{
+//				drawBackground();
+				isAllComplete = true;
+			}
+			/**
+			 *	给添加的层画黑色背景 
+			 */
+			private function drawBackground():void{
+				var color : uint = uint(PathManager.getInstance().getValue("color"));
+				var alpha : Number = Number(PathManager.getInstance().getValue("alpha"));
+				var Gx:Number;
+				var GY:Number;
+				Gx = ( currentCol - beginCol ) * 256;
+				GY = ( currentRow - beginRow ) * 256;
+				trace("转动！！！！！！！！！！！！！！！！！！！！");
+				colorLayer.graphics.clear();
+				colorLayer.graphics.beginFill(color,alpha);
+				colorLayer.graphics.drawRect(Gx,GY,colorLayer.width,colorLayer.height);
+				colorLayer.graphics.endFill();
+			}
+			
+		]]>
+	</fx:Script>
+	<esri:center>  
+		<esri:WebMercatorMapPoint lat="39.87958666456485" lon="116.47541400837066"/>
+		<!--<esri:WebMercatorMapPoint lat="39.87958666456485" lon="116.47541400837066"/>  -->
+		<!--<esri:WebMercatorMapPoint lat="41.0261940000" lon="116.3709170000"/>  -->
+	</esri:center> 
+</esri:Map>

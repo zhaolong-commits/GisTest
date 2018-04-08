@@ -1,0 +1,9 @@
+#背景图
+baseMap=D:\map\baseMap
+
+#中心点纬度(latitude)
+lat=39.87958666456485
+#中心点经度(longitude)
+lon=116.47541400837066
+#图片类型
+pictureType=jpg

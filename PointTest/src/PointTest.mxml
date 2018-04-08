@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					    creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+//			import nodeAndLine.TestNode;
+			
+			protected function windowedapplication1_initializeHandler(event:FlexEvent):void
+			{
+				var maxNumber : Number = 1000;
+				var maxy : Number = 10;
+				for( var j : int = 0; j < maxy;j++ ){
+					for( var i : int = 0; i < maxNumber;i++ ){
+						var node : Sprite = new Sprite();
+						node.width = node.height = 0.5;
+						node.x = i;
+						node.y = j;
+						testGroup.stage.addChild(node);
+					}
+				}
+			}
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				var maxNumber : Number = 1000;
+				var maxy : Number = 10;
+				for( var j : int = 0; j < maxy;j++ ){
+					for( var i : int = 0; i < maxNumber;i++ ){
+						var node : Sprite = new Sprite();
+						node.width = node.height = 0.5;
+						node.x = i;
+						node.y = j;
+						if( this.stage ){
+							trace("可是添加");
+							this.stage.addChild(node);
+						}else{
+							trace("no");
+						}
+						
+					}
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Scroller width="100%" height="100%">
+		<s:Group id="testGroup" width="100%" height="100%" x="0" y="0">
+			
+		</s:Group>
+	</s:Scroller>
+
+</s:WindowedApplication>

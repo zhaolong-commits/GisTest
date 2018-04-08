@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<levels>
+	<level id="1" beginCol="1" endCol="2" beginRow="0" endRow="1"></level>
+	<level id="2" beginCol="2" endCol="4" beginRow="1" endRow="2"></level>
+	<level id="3" beginCol="5" endCol="8" beginRow="2" endRow="4"></level>
+	<level id="4" beginCol="11" endCol="16" beginRow="5" endRow="8" ></level>	
+	
+	 
+	<level id="5" beginCol="20" endCol="31" beginRow="9" endRow="16"  ></level> 
+	<level id="6" beginCol="40" endCol="62" beginRow="18" endRow="32" ></level>
+	<level id="7" beginCol="79" endCol="112" beginRow="36" endRow="58" ></level>
+	<level id="8" beginCol="163" endCol="245" beginRow="73" endRow="127"></level>		
+	<level id="9" beginCol="326" endCol="491" beginRow="146" endRow="255" ></level>
+	<level id="10" beginCol="652" endCol="983" beginRow="293" endRow="511"  ></level>
+	<level id="11" beginCol="1305" endCol="1966" beginRow="586" endRow="1022" ></level>
+	<level id="12" beginCol="2789" endCol="3609" beginRow="1282" endRow="2045" ></level>
+	
+	<level id="13" beginCol="5578" endCol="7218" beginRow="2564" endRow="4090" ></level>
+	<level id="14" beginCol="11156" endCol="14338" beginRow="5128" endRow="7464" ></level>
+	<level id="15" beginCol="22311" endCol="28872" beginRow="10255" endRow="16360"></level>
+</levels>

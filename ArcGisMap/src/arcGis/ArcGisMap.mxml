@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<esri:Map xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		load="maploadHandler(event)"
+		logoVisible="true"
+		multiTouchRotationEnabled="true"
+		scaleBarVisible="true"
+		zoomEnd="map1_zoomEndHandler(event)"
+		zoomSliderVisible="true"
+		mapNavigationEnabled="true"
+		xmlns:esri="http://www.esri.com/2008/ags" xmlns:gis="cn.showclear.gis.*" xmlns:gis1="cn.road.gis.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.Graphic;
+			import com.esri.ags.SpatialReference;
+			import com.esri.ags.events.MapEvent;
+			import com.esri.ags.events.ZoomEvent;
+			import com.esri.ags.geometry.MapPoint;
+			import com.esri.ags.geometry.Polyline;
+			import com.esri.ags.symbols.SimpleLineSymbol;
+			import com.esri.ags.symbols.SimpleMarkerSymbol;
+			
+			import mx.events.FlexEvent;
+			
+			import PathConfig.PathManager;
+			
+			import cn.showclear.gis.GoogleMapLayer;
+			protected function maploadHandler(event:MapEvent):void
+			{
+				this.level=9;	//设置级别
+				if( centerPoint ){
+					centerPoint.lat = Number(PathManager.getInstance().getValue("lat"));
+					centerPoint.lon = Number(PathManager.getInstance().getValue("lon"));
+				}
+			}
+			//背景地图
+			private var baseLayer : GoogleMapLayer;
+			//省边界层
+			private var provinceBorderLayer : GoogleMapLayer;
+			//城市边界层
+			private var cityBoundaryLayer : GoogleMapLayer;
+			//县边界层
+			private var countyBorderLayer : GoogleMapLayer;
+			
+			//高速路层
+			private var heightWayLayer : GoogleMapLayer;
+			//国道路层
+			private var nationalHeightWayLayer : GoogleMapLayer;
+			//省道层
+			private var provincialHighwayLayer : GoogleMapLayer;
+			//城际快线层
+			private var expresswayLayer : GoogleMapLayer;
+			//县道层
+			private var CountyHighwayLayer :GoogleMapLayer;
+			//铁路层
+			private var railwayLayer : GoogleMapLayer;
+			
+			//站点以及城市层
+			private var SiteAndCityLayer : GoogleMapLayer;
+			
+			public function getMapLayer():void{
+				
+				//基础的
+				baseLayer = new GoogleMapLayer();
+				var type : String = PathManager.getInstance().getValue("pictureType");
+				if( type == null ){
+					baseLayer.pictureType = "jpg";
+				}else{
+					baseLayer.pictureType = type;
+				}
+				baseLayer.gisDir = PathManager.getInstance().getValue("baseMap");
+				addLayer(baseLayer,0);
+				
+/*				provinceBorderLayer = new GoogleMapLayer();
+				provinceBorderLayer.pictureType = "jpg";
+				provinceBorderLayer.gisDir = PathManager.getInstance().getValue("provinceBorder");
+				addLayer(provinceBorderLayer,1);*/
+//				addLine(pointArr);
+				
+				addLine(pointArr2);
+			}
+			
+			private var pointArr = [
+				{lon:116.31844,lat:39.98606},
+				{lon:116.41525,lat:39.98870}
+			];
+			
+			private var pointArr2 =[
+				{lon:116.306076,lat:39.985275},
+				{lon:116.410103,lat:39.988695}
+			];
+			
+			private function addLine(arr:Array):void{
+				if( defaultGraphicsLayer == null ){
+					callLater(addLine,[arr]);
+					return;
+				}
+				for( var i : int =0;i < arr.length;i++ ){
+					var mapPoint : MapPoint = CoordinateUtil.jingwei2MoQia(pointArr[i].lat,pointArr[i].lon,new SpatialReference(102100));
+					var nodeSy : SimpleMarkerSymbol = new SimpleMarkerSymbol("circle",2,0xff0000);
+					var node : Graphic = new Graphic(mapPoint,nodeSy);
+					node.id = pointArr[i].id;
+					defaultGraphicsLayer.add(node);
+					if( i < pointArr.length-1 ){
+						var arr : Array = [];
+						arr.push(CoordinateUtil.jingwei2MoQia(pointArr[i].lat,pointArr[i].lon));
+						arr.push(CoordinateUtil.jingwei2MoQia(pointArr[i+1].lat,pointArr[i+1].lon));
+						var myPolyLine : Polyline = new Polyline([arr],new SpatialReference(102100));
+						var lineSy : SimpleLineSymbol = new SimpleLineSymbol("normal",0xff0000,1,2);
+						var myGraphicLine : Graphic = new Graphic(myPolyLine,lineSy);
+						defaultGraphicsLayer.add(myGraphicLine);
+					}
+				}
+			}
+			
+			protected function map1_zoomEndHandler(event:ZoomEvent):void
+			{
+				// TODO Auto-generated method stub
+
+			}
+			
+		]]>
+	</fx:Script>
+	<esri:center>  
+		<esri:WebMercatorMapPoint id="centerPoint"/>
+		<!--<esri:WebMercatorMapPoint lat="39.87958666456485" lon="116.47541400837066"/>  -->
+		<!--<esri:WebMercatorMapPoint lat="41.0261940000" lon="116.3709170000"/>  -->
+	</esri:center> 
+</esri:Map>

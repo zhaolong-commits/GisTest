@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="utf-8"?>
+<esri:Map xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		load="maploadHandler(event)"
+		attributionVisible="false"
+		logoVisible="false"
+		multiTouchRotationEnabled="false"
+		scaleBarVisible="false"
+		zoomEnd="map1_zoomEndHandler(event)"
+		panEnd="map1_panEndHandler(event)"
+		zoomSliderVisible="false"
+		initialize="map1_initializeHandler(event)"
+		mapNavigationEnabled="false"
+		xmlns:esri="http://www.esri.com/2008/ags" 
+		xmlns:gis="cn.showclear.gis.*" 
+		xmlns:gis1="cn.road.gis.*">
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.events.LayerEvent;
+			import com.esri.ags.events.MapEvent;
+			import com.esri.ags.events.PanEvent;
+			import com.esri.ags.events.ZoomEvent;
+			import com.esri.ags.layers.GraphicsLayer;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.utils.StringUtil;
+			
+			import Config.NodeAndLineConfigManager;
+			import Config.PathManager;
+			
+			import GisDataProcess.MethodManager;
+			import GisDataProcess.ParseGisData;
+			
+			import Utils.GisUtil;
+			
+			import cn.showclear.gis.GoogleMapLayer;
+			import cn.zhrz.arcgis.CoordinateUtil;
+			import cn.zhrz.arcgis.LogManager;
+			import cn.zhrz.arcgis.MapConfig;
+			
+			import manager.NodeAndLineManager;
+			
+			/**
+			 *	组件初始化的时候加载 
+			 */
+			protected function map1_initializeHandler(event:FlexEvent):void
+			{
+//				requestTimer.addEventListener(TimerEvent.TIMER,getPoint);
+
+			}
+			//---------------------------------------------------添加不同的层--------------------------------------------------------------------------//
+			private var baseLayer : GoogleMapLayer;
+			private var graphicLayer : GraphicsLayer;
+			
+			private var bounderLayer : GraphicsLayer;
+			private var cityBoundaryLayer : GraphicsLayer;
+			private var countyBorderLayer : GraphicsLayer;
+			
+			private var railwayLayer : GraphicsLayer;
+			private var heightWayLayer : GraphicsLayer;
+			private var nationalHeightWayLayer : GraphicsLayer;
+			private var provincialHighwayLayer : GraphicsLayer;
+			private var expresswayLayer : GraphicsLayer;
+			private var CountyHighwayLayer : GraphicsLayer;
+			
+			public function getMapLayer():void{				
+				//地图layer
+				baseLayer = new GoogleMapLayer();
+//				baseLayer.addEventListener("mapImageLoad",onmMapImageLoad);
+				baseLayer.gisDir = PathManager.getInstance().getValue("baseMap");
+				addLayer(baseLayer,0);
+				
+				//黑幕layer
+				graphicLayer = new GraphicsLayer();
+				graphicLayer.addEventListener(LayerEvent.LOAD,loadEvent);
+				addLayer(graphicLayer,1);
+				
+				//省边界layer				
+				bounderLayer = new GraphicsLayer();
+				bounderLayer.id = "bounder";
+				addLayer(bounderLayer,2);
+				
+				//市界Layer
+				cityBoundaryLayer = new GraphicsLayer();
+				cityBoundaryLayer.id = "cityBoundary";
+				addLayer(cityBoundaryLayer,3);
+				
+				//县城边界Layer
+				countyBorderLayer = new GraphicsLayer();
+				countyBorderLayer.id = "countyBorder";
+				addLayer(countyBorderLayer,4);
+
+				//高速公路层
+				heightWayLayer = new GraphicsLayer();
+				heightWayLayer.id = "heightWay";
+				addLayer(heightWayLayer,5);	
+				
+				//国道Layer	
+				nationalHeightWayLayer = new GraphicsLayer();
+				nationalHeightWayLayer.id = "nationalHeightWay";
+				addLayer(nationalHeightWayLayer,6);
+				
+				//省道Layer
+				provincialHighwayLayer = new GraphicsLayer();
+				provincialHighwayLayer.id = "provincialWay";
+				addLayer(provincialHighwayLayer,7);
+				
+				//城际快速车道Layer
+				expresswayLayer = new GraphicsLayer();
+				expresswayLayer.id = "expressWay";
+				addLayer(expresswayLayer,8);
+				
+				//县道Layer
+				CountyHighwayLayer = new GraphicsLayer();
+				CountyHighwayLayer.id = "countyHeighway";
+				addLayer(CountyHighwayLayer,9);
+				
+				//铁路Layer				
+				railwayLayer = new GraphicsLayer();
+				railwayLayer.id = "railway";
+				addLayer(railwayLayer,10);
+			}
+			//---------------------------------------------------移动地图--------------------------------------------------------------------------//
+			private var isStratScrap:Boolean = false;
+			private var horDirect:String = "right";
+			private var timer:Timer = new Timer(nextDuration);
+			
+			private var basePath:String = "mapImages";
+			public var currentCol:Number = 376; //列
+			public var currentRow:Number = 160;//行
+			
+			private var beginCol:Number = 376;
+			private var beginRow:Number = 160;
+			
+			private var endCol:Number = 440//453;
+			private var endRow:Number = 239;
+			
+			private var nextDuration:Number = 5000;
+			private var isNext:Boolean = false;
+			private var _canGo:Boolean = true;
+			
+			public function scrapImage():void{
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(this.level)){
+					var configData:Object = MapConfig.LEVEL_DATAS[this.level];
+					this.beginCol = configData["beginCol"]
+					this.beginRow = configData["beginRow"]
+						
+					this.endCol = configData["endCol"]
+					this.endRow = configData["endRow"]
+						
+//					removeAllLayers();
+					getRoadAndLineConfig(configData);
+//					getMapLayer();
+					ParseGisData.pos = configData["pos"];
+					this.currentCol = this.beginCol;
+					this.currentRow = this.beginRow;
+					
+					LogManager.getInstance().onLogMessage("beginCol="+beginCol+",beginRow="+beginRow+",endCol="+endCol+",endRow="+endRow+",currentCol="+currentCol+",currentRow="+currentRow);
+				}
+				else{
+					Alert.show("配置文件没有配置改级别地图"); 
+					return;
+				}
+				isStratScrap = true;
+//				firtAddSite();
+				MethodManager.getInstance().firstCall();
+				
+				this.timer.start();
+			}
+			
+			private var scrapByParams : Boolean = false;
+			private var scrapCol : Number = 0;
+			private var scrapRow : Number = 0;
+			
+			public function scrapImageByParams(Col:int,Row:int,isScrap:Boolean = false):void{
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(this.level)){
+					var configData:Object = MapConfig.LEVEL_DATAS[this.level];
+					this.beginCol = configData["beginCol"];
+					this.beginRow = configData["beginRow"];
+					
+					this.endCol = configData["endCol"];
+					this.endRow = configData["endRow"];
+					ParseGisData.pos = configData["pos"];
+//					removeAllLayers();
+					getRoadAndLineConfig(configData);	
+//					getMapLayer();
+					
+					var colIndex : int = Col - beginCol;
+					var rowIndex : int = Row - beginRow;
+					for(var i :int = 0; i < colIndex; i++){
+						this.panRight();
+					}
+					for(var j:int=0; j < rowIndex;j++){
+						this.panDown();
+					}
+					this.currentCol = Col;
+					this.currentRow = Row;
+					
+					scrapByParams = true;
+					scrapCol = Col;
+					scrapRow = Row;
+					var myCenter:Array = GisUtil.getCenterLngLatOfGridandZooms(Col,Row,level);
+	
+					center = CoordinateUtil.jingwei2MoQia(myCenter[1],myCenter[0]);//39.8085272540,116.5649253075)// 54.6992335285,85.9570312500);
+					
+					LogManager.getInstance().onLogMessage("beginCol="+beginCol+",beginRow="+beginRow+",endCol="+endCol+",endRow="+endRow+",currentCol="+currentCol+",currentRow="+currentRow);
+				}
+				else{
+					Alert.show("配置文件没有配置改级别地图"); 
+					return;
+				}
+				isStratScrap = true;
+//				firtAddSite();
+				MethodManager.getInstance().firstCall();
+				this.timer.start();
+			}
+			
+			private var loadObj : Object;			//设置临时加载方法。保存需要加载的方法
+			
+			private function getRoadAndLineConfig(config : Object):void{
+				loadObj = new Object();
+				for( var item : String in config ){
+					if( config[item] == true ){
+						loadObj[item] = false;
+					}
+				}
+				MethodManager.getInstance().loadObj = loadObj;
+			}
+			
+			public function get canGo():Boolean
+			{
+				return _canGo;
+			}
+
+			public function set canGo(value:Boolean):void
+			{
+				_canGo = value;
+				if(_canGo){
+					this.timer.start();
+				}
+				else{
+					this.timer.stop();
+				}
+			}
+			private function newMoveTile():void{	
+				if(currentRow > endRow){
+					this.timer.stop();
+					LogManager.getInstance().onLogMessage("该级别的图截取完了。。。。。。。。。。。。。。。。。。。。。。。。。。。。")
+					return;
+				}
+				this.timer.start();
+				
+				if(isNext){
+					if(horDirect == "left" ){
+						this.panLeft();
+						currentCol--;
+						isNext = false;
+						return;
+					}
+					if(horDirect == "right" ){
+						this.panRight()
+						currentCol++;
+						isNext = false;
+						return;
+					}	
+				}
+				
+				if(currentCol >= endCol && horDirect == "right"){
+					this.panDown();
+					currentRow++;
+					horDirect = "left";
+					isNext = true;
+					return;
+				}
+				if(currentCol <= beginCol && horDirect == "left" ){
+					this.panDown();
+					currentRow++;
+					horDirect = "right";
+					isNext = true;
+					return;
+				}
+				
+				if(horDirect == "right"){
+					this.panRight();
+					currentCol++;
+				}
+				
+				if(horDirect == "left"){
+					this.panLeft();
+					currentCol--;
+				}
+			}
+			//---------------------------------------------------加载铁路点以及边界--------------------------------------------------------------------------//
+			protected function maploadHandler(event:MapEvent):void
+			{
+				this.level = 0;	//设置级别
+				//this.center = CoordinateUtil.jingwei2MoQia(55.7765730186677,84.375)//39.8085272540,116.5649253075)// 54.6992335285,85.9570312500);
+				timer.addEventListener(TimerEvent.TIMER,onTimer);
+			}
+			/**
+			 *	站点，省会，城市优先加载（数量少，一次加载即可） 
+			 */
+			private function firtAddSite():void{
+				
+				for( var key : String in loadObj ){
+					
+					if( key == "isAddSite" ){
+						getSite();
+					}
+					if(key == "isAddAirPort"){
+						getAirPort();
+					}
+					
+					if( key == "isAddCapital" ){
+						getCapital();
+					}
+					if( key == "isAddCity" ){
+						getCityName();
+					}
+					if(key == "isAddCounty"){
+						getCounty();
+					}
+					if( key == "isAddTown" ){
+						getTown();
+					}
+				}
+			}	
+
+			private function onTimer(event:TimerEvent):void{
+				this.timer.stop();
+//				if( !hasKey(loadObj) ){
+//					saveImage();
+//				}
+//				callMethod();
+				MethodManager.getInstance().CallMethod();
+				MethodManager.getInstance().addEventListener("drawSuccessed",drawSuccessed);
+			}
+			private function drawSuccessed(e:Event):void{
+				MethodManager.getInstance().removeEventListener("drawSuccessed",drawSuccessed);
+				setTimeout(saveImage,3000);
+			}
+			private function hasKey(obj:Object):Boolean{
+				var bol : Boolean = false;
+				if( obj == null ){
+					return bol
+				}
+				for( var key : String in obj ){
+					if( key !="isAddCapital" && key != "isAddCity" && key != "isAddSite" ){
+						bol = true;
+						break;
+					}
+				}
+				return bol;
+			}
+			
+			public function callMethod():void{
+				for( var key : String in loadObj ){
+					//添加省界，铁路，城市边界，高速公路，省内高速
+					if( key == "isAddBounder" ){
+						getAreaProvince();
+					}
+					if( key == "isAddrailway" ){
+						getRoadLines();
+					}
+					if( key == "isAddCityBorder" ){
+						getCityPoints();
+					}
+					if( key == "isAddHighwayLine" ){
+						getHeightwayLines();
+					}
+					if( key == "isAddNationalHighwayLine" ){
+						getNationalHighwayLine();
+					}
+				}
+			}
+			//添加火车站点
+			private function getSite():void{
+				ParseGisData.getAllRailwayStn(addSitePoint);
+			}
+			//添加飞机场
+			private function getAirPort():void{
+//				ParseGisData.getAllAirportStn();
+			}
+			
+			//添加省会			
+			private function getCapital():void{
+//				ParseGisData.getAllProvinicalCapitals(getCaptialRebackFun);
+			}
+			//查询城市
+			private function getCityName():void{
+//				ParseGisData.getAllCityPoints(getAllCityPointsReback);
+			}
+			//添加县
+			private function getCounty():void{
+//				ParseGisData.getAllCountyPoints();
+			}
+			//添加乡镇
+			private function getTown():void{
+//				ParseGisData.getAllTownPoints();
+			}
+
+			
+			//单独画铁路线
+			private function getRoadLines():void{
+				ParseGisData.getAreaLines(currentCol,currentRow,this.level,getLinesSuccessed);
+			}
+			//单独调用画省边线
+			private function getAreaProvince():void{
+				ParseGisData.getAreaRangeProvincePolygonIds(currentCol,currentRow,this.level,getAreaProvinceReback);	
+			}	
+			//查询市边界线
+			private function getCityPoints():void{
+//				ParseGisData.getAreaRangeCityPolygonPoints(currentCol,currentRow,level,getCityPointsReback);
+			}
+			
+			//添加高速道路
+			private function getHeightwayLines():void{
+				ParseGisData.getHighwayLineInMaxMinCoordinate(currentCol,currentRow,level,getHeightwayLinesReback);
+			}
+			//添加省道
+			private function getNationalHighwayLine():void{
+				ParseGisData.getNationalHighwayLineInMaxMinCoordinate(currentCol,currentRow,level,getNationalHighwayLineReback);
+			}
+			
+			private function getHeightwayLinesReback(heightwayArr : ArrayCollection):void{
+				if(heightwayArr == null || heightwayArr.length <= 0){
+					onlog("高速路路段当前区域没有结果！！！");
+					loadObj.isAddHighwayLine = true;
+					checkIsAllLoad();
+				}else{
+					heightWayLineArrLength = heightwayArr.length;
+					heightWayLineArr = heightwayArr;
+					getEveryLineByID();
+				}
+			}
+			private var heightWayLineArrLength:Number = 0;
+			private var heightWayLineArr : ArrayCollection;
+			private var wayLineIndex : int = 0;
+			private var wayLineRes : int = 0;
+			
+			private function getEveryLineByID():void{
+				if( wayLineIndex == (heightWayLineArrLength-1) ){
+					return;
+				}
+				for( var i : int = wayLineIndex; i < heightWayLineArr.length;i++ ){
+					wayLineIndex++;
+					var lineId : String = heightWayLineArr[i].id;
+					onlog("当前区域高速公路查询的线ID:"+lineId);
+					ParseGisData.getHighwayLinePointById(lineId,getHeightWayPointByLineId);
+					if( wayLineIndex%20 == 0 ){
+						break;
+					}
+				}
+			}
+			private function getHeightWayPointByLineId(pointArr : ArrayCollection):void{
+				heightWayLineArrLength--;
+				wayLineRes++;
+				if( wayLineRes == 20 ){
+					wayLineRes = 0;
+					getEveryLineByID();
+				}
+				if( pointArr == null || pointArr.length <= 0 ){
+					onlog("查询的这个线段没有值！！");
+					return;
+				}
+				NodeAndLineManager.getInstance().addHeightWayLine(pointArr);
+				if( heightWayLineArrLength == 0 ){
+					onlog("当前区域的高速路画完了！！！！");
+					wayLineIndex = 0;
+					wayLineRes = 0;
+					loadObj.isAddHighwayLine = true;
+					checkIsAllLoad();
+				}else{
+					onlog("当前区域没有画完的高速线:"+heightWayLineArrLength);
+				}
+			}
+			
+			private var nationalHeightWayArr : ArrayCollection;
+			private var nationalHeightWayLength : Number;
+			private var nationalHeightWayIndex : Number;
+			private var nationalHeightWayRes : Number;
+			
+			private function getNationalHighwayLineReback(nationalwayArr : ArrayCollection):void{
+				if( nationalwayArr == null || nationalwayArr.length <= 0 ){
+					onlog("省内高速当前区域没有结果！！");
+					loadObj.isAddNationalHighwayLine = true;
+					checkIsAllLoad();
+				}else{
+					nationalHeightWayArr = nationalwayArr;
+					nationalHeightWayLength = nationalwayArr.length;
+					getNationalHeightwayLineByID();
+				}
+			}
+			private function getNationalHeightwayLineByID():void{
+				if( nationalHeightWayIndex == nationalHeightWayLength ){
+					nationalHeightWayIndex = 0;
+					nationalHeightWayRes = 0;
+				}
+				for( var i : int = nationalHeightWayIndex;i < nationalHeightWayArr.length; i++ ){
+					nationalHeightWayIndex++;
+					var lineID : String = nationalHeightWayArr[i].id;
+					onlog("当前区域查询的省道线ID:"+lineID);
+					ParseGisData.getNationalHighwayLinePointById(lineID,getNationalHeightWayLineByIDReback);
+					if( nationalHeightWayIndex%20 == 0 ){
+						break;
+					}
+				}
+			}
+			
+			private function getNationalHeightWayLineByIDReback(pointArr : ArrayCollection):void{
+				nationalHeightWayLength--;
+				nationalHeightWayRes++;
+				if( nationalHeightWayRes == 20 ){
+					nationalHeightWayRes = 0;
+					getNationalHeightwayLineByID();
+				}
+				if( pointArr == null || pointArr.length <= 0 ){
+					onlog("获取省道的当前线段点为null");
+					return;
+				}
+				NodeAndLineManager.getInstance().addNationalHeightWayLine(pointArr);
+				if( nationalHeightWayLength == 0 ){
+					onlog("当前区域的省道画完了！！！！");
+					nationalHeightWayIndex = 0;
+					nationalHeightWayRes = 0;
+					loadObj.isAddNationalHighwayLine = true;
+					checkIsAllLoad();
+				}else{
+					onlog("当前区域没有画完的线段长度:"+nationalHeightWayLength);
+				}
+			}
+			
+			//获取所有的线回调函数
+			private function getLinesSuccessed(lineArr:ArrayCollection):void{
+				if( lineArr ){
+					lineLength = lineArr.length;
+					roadLineArr = lineArr;
+				}
+				getPointByLineID(roadLineArr);	
+			}
+			
+			public var isUseRTMP : Boolean = true;
+			
+			/**
+			 * 获取边线成功回调函数
+			 */
+			private function getAreaProvinceReback(lineArr : ArrayCollection):void{
+				
+				if( lineArr == null || lineArr.length <=0 ){
+					LogManager.getInstance().onLogMessage("当前区域没有边界线");
+				}else{
+					for( var i :int = 0; i< lineArr.length; i++ ){
+						onlog("添加第"+(i+1)+"个边界线！！");
+						NodeAndLineManager.getInstance().addBoundary(lineArr[i]);
+					}
+				}
+				loadObj.isAddBounder = true;
+				checkIsAllLoad();
+			}
+			//根据线id获取点
+			private function getPointByLineID(lineArr:ArrayCollection):void{
+				if( lineArr == null || lineArr.length <= 0 ){
+					LogManager.getInstance().onLogMessage("查询的区域没有铁路线！");
+					loadObj.isAddrailway = true;
+					checkIsAllLoad();
+				}else{
+					getPoint();
+				}
+			}
+			
+			//添加火车站点
+			private function addSitePoint(siteArr : ArrayCollection):void{
+				if( siteArr && siteArr.length > 0 ){
+					if( NodeAndLineManager.getInstance().gisMap == null ){
+						NodeAndLineManager.getInstance().gisMap = this;
+					}
+					NodeAndLineManager.getInstance().addSite(siteArr);
+				}else{
+					onlog("添加火车站点失败！！！");
+				}
+				loadObj.isAddSite = true;
+			}
+
+			
+			private function checkIsAllLoad():void{
+				for each( var item : Boolean in loadObj){
+					if( item == false ){
+						return;
+					}
+				}
+				for( var key : String in loadObj ){
+					if( key != "isAddCapital" && key != "isAddCity" && key != "isAddSite" ){
+						loadObj[key] = false;
+					}
+				}
+				saveImage();
+			}
+			
+			//---------------------------------------------------http请求加载线的点--------------------------------------------------------------------------//
+			private var resByHttp : Number = 0;
+			
+			private function getPoinByLineID2(lineArr : ArrayCollection):void{
+				if( lineArr == null || lineArr.length <= 0 ){
+					LogManager.getInstance().onLogMessage("查询的区域没有铁路线！");
+					callLater(saveImage);
+				}else{
+					resByHttp = lineArr.length;
+					for( var i : int = 0; i < lineArr.length; i++ ){
+						var lineID : String = lineArr[i].id;
+						if( StringUtil.trim(lineID) != "" ){
+							LogManager.getInstance().onLogMessage("根据线ID查询！线ID是："+lineID);
+							ParseGisData.getPointByLineId(lineID,getPointByLineIDSuccessed2);
+						}
+					}
+				}
+			}
+			private function getPointByLineIDSuccessed2(pointArr : ArrayCollection):void{
+				resByHttp--;
+				if( pointArr == null || pointArr.length <= 0 ){
+					LogManager.getInstance().onLogMessage("查询的线没有点！");
+					return;
+				}
+				drawLine2(pointArr);
+			}
+			private function drawLine2(pointArr:ArrayCollection):void{
+				NodeAndLineManager.getInstance().addNodeAndLine(pointArr);
+				if( resByHttp == 0 ){
+					LogManager.getInstance().onLogMessage("当前区域的线画完了。");
+					callLater(saveImage);
+				}else{
+					LogManager.getInstance().onLogMessage("没有画完的线:"+lineLength);
+				}
+			}
+			//---------------------------------------------------通过调用rtmp方法查询点--------------------------------------------------------------------------//
+			private var requestTimer : Timer = new Timer(1000);
+			
+			private var roadLineArr : ArrayCollection;
+			
+			private var lineLength:Number; 
+			
+			private var index : int = 0;
+			
+			private var resNum : int = 0;
+			
+			private function getPointByLineIDSuccessed(pointArr : ArrayCollection):void{
+				lineLength--;
+				resNum++;
+				if( resNum == 20 ){
+					resNum = 0;
+					getPoint();
+				}
+				if( pointArr == null || pointArr.length <= 0 ){
+					LogManager.getInstance().onLogMessage("查询的线没有点！");
+					return;
+				}
+				drawLine(pointArr);
+			}
+			/**
+			 *	根据点的集合画线 
+			 */
+			private function drawLine(pointArr:ArrayCollection):void{
+				
+				NodeAndLineManager.getInstance().addNodeAndLine(pointArr);
+				if( lineLength == 0 ){
+					trace("当前区域的线画完了。");
+					resNum = 0;
+					index = 0;
+					loadObj.isAddrailway = true;
+					checkIsAllLoad();
+				}else{
+					onlog("没有画完的铁路线:"+lineLength);
+				}
+			}
+			
+//			private function getPoint(e:TimerEvent):void{
+//				trace("开始时间器");
+//				if( index == roadLineArr.length ){ 
+//					index = 0;
+//					requestTimer.stop();
+//				}else{
+//					for( var i:int = index;i < roadLineArr.length;i++ ){
+//						index ++;
+//						var lineID : String = roadLineArr[i].id;
+//						if( StringUtil.trim(lineID) != "" ){
+//							LogManager.getInstance().onLogMessage("根据线ID查询！线ID是："+lineID);
+//							ParseGisData.getPointByLineId(lineID,getPointByLineIDSuccessed);
+//						}
+//						if( index%20 == 0 ){
+//							requestTimer.stop();
+//							break;	
+//						}
+//					}
+//				}
+//			}
+			private function getPoint():void{
+				trace("开始时间器");
+				if( index == roadLineArr.length ){ 
+					index = 0;
+				}else{
+					for( var i:int = index;i < roadLineArr.length;i++ ){
+						index++;
+						var lineID : String = roadLineArr[i].id;
+						if( StringUtil.trim(lineID) != "" ){
+							LogManager.getInstance().onLogMessage("根据线ID查询！线ID是："+lineID);
+							ParseGisData.getPointByLineId(lineID,getPointByLineIDSuccessed);
+						}
+						if( index%20 == 0 ){
+							break;	
+						}
+					}
+				}
+			}
+			//---------------------------------------------------清理以及截图--------------------------------------------------------------------------//
+			/**
+			 * 保存图片
+			 */
+			private function saveImage():void{
+				
+				var bitmapData:BitmapData = new BitmapData(256,256,true,0);
+				var matrix:Matrix = new Matrix();
+				matrix.translate(-512,-512);
+				bitmapData.draw(this,matrix);
+				var encoder:PNGEncoder = new PNGEncoder();
+				var bytes:ByteArray = encoder.encode(bitmapData);
+				var resultAddress : String = PathManager.getInstance().getValue("destination");
+				basePath = PathManager.getInstance().getValue("basePath");
+				var file:File;
+				if( resultAddress ){
+					file = new File(resultAddress+File.separator+basePath+File.separator+this.level+File.separator+currentCol+File.separator+currentRow+".png");
+				}else{
+					file = new File(File.desktopDirectory.resolvePath(basePath+File.separator+this.level+File.separator+currentCol+File.separator+currentRow+".png").nativePath);
+				}
+				//trace(file.nativePath)
+				LogManager.getInstance().onLogMessage("保存的图片为:"+file.nativePath)
+				var fileStream:FileStream = new FileStream();
+				fileStream.open(file,FileMode.WRITE);
+				fileStream.writeBytes(bytes,0,bytes.bytesAvailable);
+				fileStream.close();
+				
+				clear();
+			}
+			/**
+			 *	当前界面截图后，清理已经加载的对象。 
+			 */
+			private function clear():void{
+				NodeAndLineManager.getInstance().clearAllNodes();
+				newMoveTile();
+			}
+			
+			/**
+			 *	地图改变层级结束的时候派发事件 
+			 */
+			protected function map1_zoomEndHandler(event:ZoomEvent):void
+			{
+				drawBackground();
+			}
+			/**
+			 *  层加载成功的时候派发事件
+			 */
+			private function loadEvent(e:LayerEvent):void{
+				drawBackground();
+			}
+			/**
+			 * 地图移动(左右上下)的时候派发的事件 
+			 */
+			protected function map1_panEndHandler(event:PanEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawBackground();
+			}
+			/**
+			 *	给添加的层画黑色背景 
+			 */
+			private function drawBackground():void{
+				var color : uint = NodeAndLineConfigManager.getInstance().NodeAndLineConfig.layer["color"];
+				var alpha : Number = NodeAndLineConfigManager.getInstance().NodeAndLineConfig.layer["alpha"];
+				var Gx:Number;
+				var GY:Number;
+				if( scrapByParams ){
+					Gx = ( currentCol - scrapCol ) * 256;
+					GY = ( currentRow - scrapRow ) * 256;
+				}else{
+					Gx = ( currentCol - beginCol ) * 256;
+					GY = ( currentRow - beginRow ) * 256;
+				}
+				trace("转动！！！！！！！！！！！！！！！！！！！！");
+				graphicLayer.graphics.clear();
+				graphicLayer.graphics.beginFill(color,alpha);
+				graphicLayer.graphics.drawRect(Gx,GY,graphicLayer.width,graphicLayer.height);
+				graphicLayer.graphics.endFill();
+			}
+			private function onlog(message:String):void{
+				LogManager.getInstance().onLogMessage(message);
+			}
+			
+		]]>
+	</fx:Script>
+	
+</esri:Map>

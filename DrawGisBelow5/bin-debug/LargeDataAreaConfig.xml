@@ -1,0 +1,15 @@
+<levels>
+	<level id="4" block="64">
+		<area col="11" row="6"></area>
+		<area col="12" row="6"></area>
+		<area col="12" row="7"></area>
+		<area col="13" row="6"></area>
+		<area col="13" row="5"></area>
+	</level>
+	<level id="5" block="16" >
+		<area col="" row=""></area>
+	</level>
+	<level id="6" block="4"> 
+		<area col="" row=""></area>
+	</level>
+</levels>

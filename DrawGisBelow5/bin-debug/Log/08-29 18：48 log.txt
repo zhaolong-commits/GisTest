@@ -1,0 +1,92 @@
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+manyTime加载不符合规则，需要是4,16,64,128！
+NetConnection.Connect.Success
+rtmp连接成功
+execute RTMPRPC pkg:GisCoordinateService, method:getAllProvincialIds, args:
+RTMPRPC Result pkg:GisCoordinateService, method:getAllProvincialIds, args:,    result:RTMPRpcManager
+获取所有的省ID成功！省数量:34
+转换级别为:4,经纬度为:55.7765730186677,  67.5
+当前区域开始的坐标点：67.5,55.7765730186677
+当前区域结束的坐标点:90,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:67.5,90,40.979898069620134,55.7765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:67.5,90,40.979898069620134,55.7765730186677,    result:RTMPRpcManager
+当前区域获取的边界线!1
+添加第1个边界线！！
+这条线加载了:21220数据,消耗29026毫秒
+添加第1个边界线成功！！
+保存的图片为:D:\mapTest\mapImages\4\11\5.png
+清理当前区域的边界，道路完成！！
+当前区域开始的坐标点：90,55.7765730186677
+当前区域结束的坐标点:112.5,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:90,112.5,40.979898069620134,55.7765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:90,112.5,40.979898069620134,55.7765730186677,    result:RTMPRpcManager
+当前区域获取的边界线!5
+添加第1个边界线！！
+这条线加载了:396数据,消耗702毫秒
+添加第1个边界线成功！！
+添加第2个边界线！！
+这条线加载了:1282数据,消耗1481毫秒
+添加第2个边界线成功！！
+添加第3个边界线！！
+这条线加载了:5622数据,消耗7010毫秒
+添加第3个边界线成功！！
+添加第4个边界线！！
+这条线加载了:2303数据,消耗3074毫秒
+添加第4个边界线成功！！
+添加第5个边界线！！
+这条线加载了:354数据,消耗450毫秒
+添加第5个边界线成功！！
+保存的图片为:D:\mapTest\mapImages\4\12\5.png
+清理当前区域的边界，道路完成！！
+当前区域开始的坐标点：112.5,55.7765730186677
+当前区域结束的坐标点:135,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:112.49,135.01,40.87989806962013,56.2765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:112.49,135.01,40.87989806962013,56.2765730186677,    result:RTMPRpcManager
+当前区域获取的边界线!17
+添加第1个边界线！！
+这条线加载了:7238数据,消耗9485毫秒
+添加第1个边界线成功！！
+添加第2个边界线！！
+这条线加载了:1621数据,消耗1967毫秒
+添加第2个边界线成功！！
+添加第3个边界线！！
+这条线加载了:58数据,消耗64毫秒
+添加第3个边界线成功！！
+添加第4个边界线！！
+这条线加载了:36数据,消耗46毫秒
+添加第4个边界线成功！！
+添加第5个边界线！！
+这条线加载了:86数据,消耗146毫秒
+添加第5个边界线成功！！
+添加第6个边界线！！
+这条线加载了:12608数据,消耗17393毫秒
+添加第6个边界线成功！！
+添加第7个边界线！！
+这条线加载了:4数据,消耗5毫秒
+添加第7个边界线成功！！
+添加第8个边界线！！
+这条线加载了:19数据,消耗22毫秒
+添加第8个边界线成功！！
+添加第9个边界线！！
+这条线加载了:33281数据,消耗51001毫秒
+添加第9个边界线成功！！
+添加第10个边界线！！
+这条线加载了:1823数据,消耗2496毫秒
+添加第10个边界线成功！！
+添加第11个边界线！！
+这条线加载了:36数据,消耗44毫秒
+添加第11个边界线成功！！
+添加第12个边界线！！
+这条线加载了:17数据,消耗24毫秒
+添加第12个边界线成功！！
+添加第13个边界线！！
+这条线加载了:18851数据,消耗31346毫秒
+添加第13个边界线成功！！
+添加第14个边界线！！
+这条线加载了:493数据,消耗625毫秒
+添加第14个边界线成功！！
+添加第15个边界线！！
+这条线加载了:1129数据,消耗1962毫秒
+添加第15个边界线成功！！
+添加第16个边界线！！

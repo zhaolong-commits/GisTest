@@ -1,0 +1,46 @@
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+manyTime加载不符合规则，需要是4,16,64,128！
+NetConnection.Connect.Success
+rtmp连接成功
+execute RTMPRPC pkg:GisCoordinateService, method:getAllProvincialIds, args:
+RTMPRPC Result pkg:GisCoordinateService, method:getAllProvincialIds, args:,    result:RTMPRpcManager
+获取所有的省ID成功！省数量:34
+转换级别为:4,经纬度为:55.7765730186677,  67.5
+当前区域开始的坐标点：67.5,55.7765730186677
+当前区域结束的坐标点:90,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:67.5,90,40.979898069620134,55.7765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:67.5,90,40.979898069620134,55.7765730186677,    result:RTMPRpcManager
+当前区域获取的边界线!1
+添加第1个边界线！！
+这条线加载了:21220数据,消耗28068毫秒
+添加第1个边界线成功！！
+保存的图片为:D:\mapTest\mapImages\4\11\5.png
+清理当前区域的边界，道路完成！！
+当前区域开始的坐标点：90,55.7765730186677
+当前区域结束的坐标点:112.5,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:90,112.5,40.979898069620134,55.7765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:90,112.5,40.979898069620134,55.7765730186677,    result:RTMPRpcManager
+当前区域获取的边界线!5
+添加第1个边界线！！
+这条线加载了:396数据,消耗709毫秒
+添加第1个边界线成功！！
+添加第2个边界线！！
+这条线加载了:1282数据,消耗1471毫秒
+添加第2个边界线成功！！
+添加第3个边界线！！
+这条线加载了:5622数据,消耗7487毫秒
+添加第3个边界线成功！！
+添加第4个边界线！！
+这条线加载了:2303数据,消耗2958毫秒
+添加第4个边界线成功！！
+添加第5个边界线！！
+这条线加载了:354数据,消耗403毫秒
+添加第5个边界线成功！！
+保存的图片为:D:\mapTest\mapImages\4\12\5.png
+清理当前区域的边界，道路完成！！
+当前区域开始的坐标点：112.5,55.7765730186677
+当前区域结束的坐标点:135,40.979898069620134
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:112.49,115.3225,53.826988650036746,56.2765730186677
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:112.49,115.3225,53.826988650036746,56.2765730186677,    result:RTMPRpcManager
+当前区域没有边界线

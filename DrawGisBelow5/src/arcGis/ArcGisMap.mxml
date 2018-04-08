@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<esri:Map xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		load="maploadHandler(event)"
+		attributionVisible="false"
+		logoVisible="false"
+		multiTouchRotationEnabled="false"
+		scaleBarVisible="false"
+		zoomSliderVisible="false"
+		mapNavigationEnabled="false"
+		xmlns:esri="http://www.esri.com/2008/ags" xmlns:gis="cn.showclear.gis.*" xmlns:gis1="cn.road.gis.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.events.MapEvent;
+			import com.esri.ags.layers.GraphicsLayer;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.containers.Canvas;
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.core.UIComponent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.primitives.BitmapImage;
+			
+			import Config.MapConfig;
+			import Config.PathManager;
+			
+			import GisLayer.GoogleMapLayer;
+			
+			import Utils.LogManager;
+			
+			import manager.FileManager;
+			import manager.NodeAndLineManager;
+			
+			import parseData.MethodManager;
+
+			//背景地图
+			private var baseLayer : GoogleMapLayer;
+			
+			private var colorLayer : GraphicsLayer;
+			
+			//省边界层
+			private var provinceBorderLayer : GraphicsLayer;
+			//城市边界层
+			private var cityBoundaryLayer : GoogleMapLayer;
+			//县边界层
+			private var countyBorderLayer : GoogleMapLayer;
+			
+			//高速路层
+			private var heightWayLayer : GoogleMapLayer;
+			//国道路层
+			private var nationalHeightWayLayer : GoogleMapLayer;
+			//省道层
+			private var provincialHighwayLayer : GoogleMapLayer;
+			//城际快线层
+			private var expresswayLayer : GoogleMapLayer;
+			//县道层
+			private var CountyHighwayLayer :GoogleMapLayer;
+			//铁路层
+			private var railwayLayer : GoogleMapLayer;
+			
+			//站点以及城市层
+			private var SiteAndCityLayer : GoogleMapLayer;
+			
+			public function getMapLayer():void{
+				
+				baseLayer = new GoogleMapLayer();
+				baseLayer.id = "base";
+				baseLayer.pictureType = "png";
+				baseLayer.gisDir = PathManager.getInstance().getValue("baseMap");
+				addLayer(baseLayer,0);
+				
+				//省边界层
+				provinceBorderLayer = new GraphicsLayer();
+				provinceBorderLayer.id = "provinceBorder";
+				addLayer(provinceBorderLayer,1);
+				
+			}
+			public var imageArr : Array;
+			public var testImage : Image;
+			
+			private var timer:Timer = new Timer(2000);
+			
+			public var currentCol:Number = 376; //列
+			public var currentRow:Number = 160;//行
+			
+			private var beginCol:Number = 376;
+			private var beginRow:Number = 160;
+			
+			private var endCol:Number = 440//453;
+			private var endRow:Number = 239;
+			
+			public function scrapImage():void{
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(this.level)){
+					var configData:Object = MapConfig.LEVEL_DATAS[this.level];
+					this.beginCol = configData["beginCol"]
+					this.beginRow = configData["beginRow"]
+					
+					this.endCol = configData["endCol"]
+					this.endRow = configData["endRow"]
+
+					this.currentCol = this.beginCol;
+					this.currentRow = this.beginRow;
+					isNext = false;
+					horDirect= "right";
+//					LogManager.getInstance().onLogMessage("beginCol="+beginCol+",beginRow="+beginRow+",endCol="+endCol+",endRow="+endRow+",currentCol="+currentCol+",currentRow="+currentRow);
+				}
+				else{
+					Alert.show("配置文件没有配置改级别地图"); 
+					return;
+				}
+				
+				this.timer.start();
+			}
+			protected function maploadHandler(event:MapEvent):void
+			{
+				this.level=0;	//设置级别
+				timer.addEventListener(TimerEvent.TIMER,onTimerEventHandler);
+			}
+			private function onTimerEventHandler(e:TimerEvent):void{
+				timer.stop();
+				MethodManager.getInstance().getAreaProvince();
+//				saveImage();
+			}
+			private var basePath:String = "mapImages";
+			
+			private var _manyTime : Number = 0;
+
+			public function get manyTime():Number
+			{
+				return _manyTime;
+			}
+
+			public function set manyTime(value:Number):void
+			{
+				_manyTime = value;
+				dealWithData();
+			}
+			private function dealWithData():void{
+				
+				var sqrt : Number = Math.sqrt(manyTime);
+			
+				singleMargin = 256/sqrt;
+				
+				singleAreaArr = new Array();
+				
+				for( var i:int=0;i<sqrt;i++ ){
+					for( var j : int = 0;j <sqrt;j++ ){
+						var singleArea : Object = new Object();
+						singleArea.x = -512 - singleMargin * j;
+						singleArea.y = -512 - singleMargin * i;
+						singleAreaArr.push(singleArea);
+					}
+				}
+			}
+			private var singleMargin : Number;
+			
+			private var index : Number = 0;
+			
+			private var singleAreaArr : Array;
+			
+			public function saveImage(isDivid : Boolean = false,currentArea : Number = 0):void{
+				
+				if( isDivid ){
+					saveAreaImage(currentArea);
+				}else{
+					FileManager.getInstance().saveImage(this,-512,-512);
+				}		
+			}
+			
+			private function saveAreaImage(currentArea : Number = 0):void{
+				
+				var currentAreaObj : Object = singleAreaArr[currentArea];
+				
+				var bitmapData:BitmapData = new BitmapData(singleMargin,singleMargin,true,0);
+				var matrix:Matrix = new Matrix();
+				matrix.translate(currentAreaObj.x,currentAreaObj.y);
+				bitmapData.draw(this,matrix);
+				
+				var encoder:PNGEncoder = new PNGEncoder();
+				var bytes:ByteArray = encoder.encode(bitmapData);
+				(imageArr[currentArea] as Image).source = bytes;	
+				bitmapData.dispose();
+				bitmapData = null;
+				dispatchEvent(new Event("saveOneAreaSuccessed"));
+				
+				setTimeout(FileManager.getInstance().saveLittleImage,3000,imageArr[currentArea] as Image,singleMargin,singleMargin,currentArea);
+
+				if( currentArea == (singleAreaArr.length)-1 ){
+					dispatchEvent(new Event("dividedSaveSuccessed"));
+				}
+			}
+			
+			private var isNext:Boolean = false;
+			private var horDirect:String = "right";
+			
+			public function newMoveTile():void{	
+				
+				NodeAndLineManager.getInstance().clearAllNodes();
+				
+				if(currentRow > endRow){
+					this.timer.stop();
+					LogManager.getInstance().onLogMessage("该级别的图截取完了。。。。。。。。。。。。。。。。。。。。。。。。。。。。");
+					dispatchEvent(new Event("currentPrvinceSuccessed"));
+					return;
+				}
+				this.timer.start();
+				
+				if(isNext){
+					if(horDirect == "left" ){
+						this.panLeft();
+						currentCol--;
+						isNext = false;
+						return;
+					}
+					if(horDirect == "right" ){
+						this.panRight()
+						currentCol++;
+						isNext = false;
+						return;
+					}	
+				}
+				
+				if(currentCol >= endCol && horDirect == "right"){
+					this.panDown();
+					currentRow++;
+					horDirect = "left";
+					isNext = true;
+					return;
+				}
+				if(currentCol <= beginCol && horDirect == "left" ){
+					this.panDown();
+					currentRow++;
+					horDirect = "right";
+					isNext = true;
+					return;
+				}
+				
+				if(horDirect == "right"){
+					this.panRight();
+					currentCol++;
+				}
+				
+				if(horDirect == "left"){
+					this.panLeft();
+					currentCol--;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<esri:center>  
+		<esri:WebMercatorMapPoint lat="39.87958666456485" lon="116.47541400837066"/>
+		<!--<esri:WebMercatorMapPoint lat="39.87958666456485" lon="116.47541400837066"/>  -->
+		<!--<esri:WebMercatorMapPoint lat="41.0261940000" lon="116.3709170000"/>  -->
+	</esri:center> 
+</esri:Map>

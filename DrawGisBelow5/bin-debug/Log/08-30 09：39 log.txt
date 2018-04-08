@@ -1,0 +1,9 @@
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+manyTime加载不符合规则，需要是4,16,64,128！
+NetConnection.Connect.Success
+rtmp连接成功
+execute RTMPRPC pkg:GisCoordinateService, method:getAllProvincialIds, args:
+RTMPRPC Result pkg:GisCoordinateService, method:getAllProvincialIds, args:,    result:RTMPRpcManager
+获取所有的省ID成功！省数量:34
+转换级别为:4,经纬度为:55.7765730186677,  67.5

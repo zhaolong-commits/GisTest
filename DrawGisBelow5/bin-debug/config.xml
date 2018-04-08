@@ -1,0 +1,17 @@
+#背景图
+baseMap=D:\mapTest\mapImages
+#服务地址
+endPoint=rtmp://192.168.1.219/lookup
+
+
+#最后生成的图片路径
+destination=D:\mapTest
+#图片类型
+pictureType=png
+
+#省边界颜色
+color=0x3f5a76
+#省边界透明度
+alpha=1
+#省边界宽
+width=1
