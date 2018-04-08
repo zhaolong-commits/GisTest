@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<!-- 地图黑色背景 -->
+	<layer>
+		<color>0x141b2b</color>
+		<alpha>0</alpha>
+	</layer>
+	
+	
+	<!-- 火车站点设置 -->
+	<site>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x307295</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontSize>10</fontSize>
+		<fontColor>0xffffff</fontColor>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>20</textYpos>
+	</site>
+	<!-- 飞机点设置 -->
+	<airPort>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x307295</color>
+		<isShowNode>false</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontSize>10</fontSize>
+		<fontColor>0xffffff</fontColor>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>20</textYpos>
+	</airPort>
+	<!-- 省会配置 -->
+	<capital>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>false</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>
+	</capital>
+	<!-- 城市配置 -->
+	<city>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>	
+	</city>
+	<!-- 区配置 -->
+	<area>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>false</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<bold>true</bold>
+		<fontSize>12</fontSize>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>		
+	</area>
+	<!-- 县城配置 -->
+	<County>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>false</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>		
+	</County>
+	<!-- 乡镇配置 -->
+	<town>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>	
+	</town>
+	
+	<!-- 街道配置 -->
+	<street>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>	
+	</street>
+	
+	<!-- 省界边设置 -->
+	<border>
+		<color>0x3f5a76</color>
+		<alpha>1</alpha>
+		<width>1</width>
+	</border>
+	
+	<!-- 城市边界配置 -->
+	<cityBorder>
+		<color>0x3f5a76</color>
+		<alpha>1</alpha>
+		<width>1</width>
+	</cityBorder>
+	
+	<!-- 县城边界配置 -->
+	<CountyBorder>
+		<color>0x3f5a76</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</CountyBorder>
+	
+	
+	<!-- 铁路线设置 -->
+	<Line>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>
+	</Line>
+	
+	<!-- 高速配置 -->
+	<heightWay>
+		<color>0x7f5f00</color>
+		<alpha>1</alpha>
+		<width>1</width>		
+	</heightWay>
+	
+	<!-- 国道配置 -->
+	<nationalHeightWay>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</nationalHeightWay>
+	
+	<!-- 省道配置 -->
+	<ProvincialHighway>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</ProvincialHighway>
+	
+	<!-- 县道配置 -->
+	<CountyHighway>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</CountyHighway>
+	
+	<!-- 城市快速公路线配置 -->
+	<Expressway>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</Expressway>
+	
+	<!-- 乡镇车道配置 -->
+	<xzcd>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</xzcd>
+	
+	<!-- 加油站配置 -->
+	<gasStation>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>	
+	</gasStation>
+	
+	<!-- 金融服务点配置 -->
+	<financePoint>
+		<style>circle</style>
+		<size>10</size>
+		<color>0x7aaae0</color>
+		<isShowNode>true</isShowNode>
+		<isShowText>true</isShowText>
+		<fontFamily>微软雅黑</fontFamily>
+		<fontColor>0x05afc3</fontColor>
+		<fontSize>12</fontSize>
+		<bold>false</bold>
+		<textXpos>0</textXpos>
+		<textYpos>-15</textYpos>	
+	</financePoint>
+	
+	<!-- 九级道路配置 -->
+	<nineGrade>
+		<color>0xb4cbe5</color>
+		<alpha>1</alpha>
+		<width>1</width>	
+	</nineGrade>
+</root>

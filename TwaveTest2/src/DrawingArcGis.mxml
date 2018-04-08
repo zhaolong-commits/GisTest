@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   width="100%" height="100%"  showStatusBar="false"
+					   initialize="windowedapplication1_initializeHandler(event)"
+					   xmlns:arcGis="arcGis.*">
+	<fx:Script>
+		<![CDATA[
+			import com.esri.ags.events.MapMouseEvent;
+			import com.esri.ags.events.PanEvent;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.utils.StringUtil;
+			
+			import Config.LargeDataAreaConfigManager;
+			import Config.MapConfigManager;
+			import Config.NodeAndLineConfigManager;
+			import Config.PathManager;
+			
+			import GisDataProcess.MethodManager;
+			
+			import Utils.GisUtil;
+			
+			import cn.zhrz.arcgis.CoordinateUtil;
+			import cn.zhrz.arcgis.LogEvent;
+			import cn.zhrz.arcgis.LogManager;
+			import cn.zhrz.arcgis.MapConfig;
+			
+			import manager.FileManager;
+			import manager.NodeAndLineManager;
+			import manager.RTMPRpcManager;
+			
+			protected function windowedapplication1_initializeHandler(event:FlexEvent):void
+			{
+				createLogText();
+				//初始化日志
+			    LogManager.getInstance().addEventListener(LogEvent.LOG_EVENT,  omLogMsg);			
+				//设置程序全屏
+				this.maximize();                                                                   
+				//加载地图路径config配置文件，
+				var file : File = File.applicationDirectory.resolvePath("config.xml");
+				var content : String;
+				if( file.exists ){
+					var fileStream : FileStream = new FileStream();
+					fileStream.open(file,FileMode.READ);
+					content = fileStream.readUTFBytes(fileStream.bytesAvailable);
+					fileStream.close();
+				}
+				if( content ){
+					PathManager.getInstance().parseConfig(content);
+				}
+				//加载地图级别信息配置文件
+				var file2:File = new File(File.applicationDirectory.resolvePath("mapConfig.xml").nativePath);
+				if(file2.exists){
+					var fileStream2:FileStream = new FileStream();
+					fileStream2.open(file2,FileMode.READ);
+					var xmlContent:String = fileStream2.readUTFBytes(fileStream2.bytesAvailable);
+					fileStream2.close();
+					
+					MapConfigManager.getInstance().parseMapConfig(xmlContent);
+				}
+				//加载关于点和线的配置信息
+				var file3 : File =  new File(File.applicationDirectory.resolvePath("NodeAndLineConfig.xml").nativePath);
+				if( file3.exists ){
+					var filestream3:FileStream = new FileStream();
+					filestream3.open(file3,FileMode.READ);
+					var nodeContent : String = filestream3.readUTFBytes(filestream3.bytesAvailable);
+					filestream3.close();
+					NodeAndLineConfigManager.getInstance().parseConfig(nodeContent);
+				}
+				//加载需要特殊处理的文件
+				var file4 : File = new File(File.applicationDirectory.resolvePath("LargeDataAreaConfig.xml").nativePath);
+				if( file4.exists ){
+					var fileStream4 : FileStream = new FileStream();
+					fileStream4.open(file4,FileMode.READ);
+					var xmlContent2:String = fileStream4.readUTFBytes(fileStream4.bytesAvailable);
+					fileStream4.close();
+					
+					LargeDataAreaConfigManager.getInstance().parseConfig(xmlContent2);
+				}
+				//连接远程rpc
+				doRpcServce();
+				//设置远程连接
+//				HttpRpcManager.getInstance().endPoint = PathManager.getInstance().getValue("endPoint");
+				//设置NodeAndLineManager关联的gisMap
+				NodeAndLineManager.getInstance().gisMap = myArcGis;
+				MethodManager.getInstance().gisMap = myArcGis;
+				FileManager.getInstance().gisMap = myArcGis;
+				
+				doInit();
+			}
+			private function createLogText():void{
+				var date : Date = new Date();
+				var dateFor : DateFormatter = new DateFormatter();
+				dateFor.formatString = "MM-DD HH：NN";
+				var dateString : String = dateFor.format(date);
+				var logFileDir : File = new File(File.applicationDirectory.resolvePath("Log").nativePath); 
+				if( logFileDir.exists == false ){
+					logFileDir.createDirectory();
+				}
+				logFile = new File(logFileDir.nativePath+"/"+dateString+" log.txt");
+			}
+			
+			//初始化地图，画图
+			private function doInit():void{ 
+				
+				myArcGis.getMapLayer();
+				//根据行列获取坐标点
+				var dd:Array = GisUtil.getCenterLngLatOfGridandZooms(376,160,9);
+				trace(dd)
+				//根据坐标点获取行列
+				dd = GisUtil.getGridsOfZooms(84.375,55.7765730186677,9);
+				trace(dd)	
+				_myCanvas.graphics.clear();
+				_myCanvas.graphics.lineStyle(1,0xff0000,1);
+				_myCanvas.graphics.moveTo(512,0);
+				_myCanvas.graphics.lineTo(512,1024);
+				
+				_myCanvas.graphics.moveTo(0,512);
+				_myCanvas.graphics.lineTo(1024,512);
+				
+				_myCanvas.graphics.moveTo(512+256,512);
+				_myCanvas.graphics.lineTo(512+256,1024);
+				
+				_myCanvas.graphics.moveTo(512,768);
+				_myCanvas.graphics.lineTo(768,768);
+
+				_myCanvas.graphics.endFill();				
+			}
+			
+			private function doRpcServce():void{
+				var url:String = PathManager.getInstance().getValue("endPoint");
+				if( StringUtil.trim(url) != "" ){
+					RTMPRpcManager.getInstance().getConnect(url);
+				}else{
+					LogManager.getInstance().onLogMessage("服务器路径设置错误！");
+				}
+			}
+
+			//地图点击事件
+			private function onMapClick(event:MapMouseEvent):void{
+				
+				var lat:Number = CoordinateUtil.Mercator2Lat(event.mapPoint.y);
+				var lon:Number = CoordinateUtil.Mercator2Lon(event.mapPoint.x);
+				trace("map click ====,lat="+lat+",lon="+lon)
+				
+				var beginArr:Array = GisUtil.getGridsOfZooms(lon,lat,9);
+				trace(beginArr);
+			}
+			//地图移动事件
+			private function onPanEnd(event:PanEvent):void{
+				var beginLat:Number = CoordinateUtil.Mercator2Lat( event.extent.ymin);
+				var endLat:Number = CoordinateUtil.Mercator2Lat( event.extent.ymax);
+				
+				var beginLon:Number =  CoordinateUtil.Mercator2Lon( event.extent.xmin);
+				var endLon:Number = CoordinateUtil.Mercator2Lon( event.extent.xmax);
+				
+				LogManager.getInstance().onLogMessage("pan completd ====,beginLat="+beginLat+",endLat="+endLat+",beginLon="+beginLon+",endLon="+endLon)
+				
+				var beginArr:Array = GisUtil.getGridsOfZooms(beginLon,beginLat,9);
+				LogManager.getInstance().onLogMessage("pan col="+beginArr[0]+", row="+beginArr[1])
+			}
+
+			//调用地图画线功能
+			private function drawGis():void{
+				myArcGis.level = Number(_mapLevel.text);
+				if(MapConfig.LEVEL_DATAS.hasOwnProperty(myArcGis.level)){
+					
+					if( LargeDataAreaConfigManager.getInstance().largeDataAreaConfig.hasOwnProperty(myArcGis.level) ){
+						var largeConfig : Object = LargeDataAreaConfigManager.getInstance().largeDataAreaConfig[myArcGis.level];
+						if( largeConfig.hasOwnProperty("block") ){
+							blocks = MethodManager.getInstance().block = myArcGis.blocks = largeConfig.block;
+							MethodManager.getInstance().specialArr = largeConfig.areaArr;
+						}	
+						if(largeConfig.hasOwnProperty("lpos")){
+							MethodManager.getInstance().lpos = largeConfig.lpos;
+						}
+						if(largeConfig.hasOwnProperty("rpos")){
+							MethodManager.getInstance().rpos = largeConfig.rpos;
+						}
+						if(largeConfig.hasOwnProperty("tpos")){
+							MethodManager.getInstance().tpos = largeConfig.tpos;
+						}
+						if(largeConfig.hasOwnProperty("bpos")){
+							MethodManager.getInstance().bpos = largeConfig.bpos;
+						}
+					}
+					var config:Object = MapConfig.LEVEL_DATAS[myArcGis.level];
+/*					var lat:Number = config.lat;
+					var lon:Number =  config.lon;*/
+					
+					var dd:Array = GisUtil.getCenterLngLatOfGridandZooms(config.beginCol,config.beginRow,Number(_mapLevel.text));
+					var lat:Number = dd[1];
+					var lon:Number = dd[0];
+					//设置地图中心
+					myArcGis.center = CoordinateUtil.jingwei2MoQia(lat,lon);//39.8085272540,116.5649253075)// 54.6992335285,85.9570312500);
+					
+					LogManager.getInstance().onLogMessage("转换级别为:"+myArcGis.level +",经纬度为:"+lat+",  "+lon);
+					
+					var currentCol : int = parseInt(startCol.text);
+					var currentRow : int = parseInt(startRow.text);
+					//开始抓图
+					if( currentCol >= config.beginCol && currentCol <= config.endCol && currentRow >= config.beginRow && currentRow <= config.endRow ){
+						myArcGis.scrapImageByParams(currentCol,currentRow);
+					}else{
+						myArcGis.scrapImage();
+					}
+					allBorder.enabled = false;
+				}
+				else{
+					Alert.show("配置文件没有配置该级别地图"); 
+				}
+			}
+			
+			private var logNum : Number = 0;
+			
+			private function omLogMsg(event:LogEvent):void{
+				trace(event.msg);
+				logNum++;
+				if( logNum%50 == 0 ){
+					_logTextArea.text = "";
+				}
+				_logTextArea.text+=(event.msg+"\n");
+				_logTextArea.verticalScrollPosition = _logTextArea.maxVerticalScrollPosition;
+				writeLogToLocalFile(event.msg);
+			}
+			private var logFile : File;
+			
+			private function writeLogToLocalFile(message : String):void{
+				var fs1 : FileStream = new FileStream();
+				try{
+					fs1.open(logFile,FileMode.READ);
+					if( fs1.bytesAvailable >= 10485760 ){
+						var fileByteArr : ByteArray = new ByteArray();
+						fs1.readBytes(fileByteArr,0,fs1.bytesAvailable);
+						var resultByteArr : ByteArray = new ByteArray();
+						resultByteArr.writeBytes(fileByteArr,5242880,(fileByteArr.length-5242880));
+						fs1.close();
+						var fsWrite : FileStream = new FileStream();
+						try{
+							fsWrite.open(logFile,FileMode.WRITE);
+							fsWrite.writeBytes(resultByteArr,0,resultByteArr.length);	
+						}catch(e:Error){
+							trace(e.message);
+						}finally{
+							fsWrite.close();
+						}
+					}
+				}catch(e:Error){
+					trace(e.message);
+				}finally{
+					fs1.close();
+				}
+				
+				var fs : FileStream = new FileStream();
+				try{	
+					fs.open(logFile,FileMode.APPEND);
+					fs.writeUTFBytes(message+"\r\n");
+				}catch(e:Error){
+					trace(e.message);
+				}finally{
+					fs.close();
+				}
+			}
+			
+			protected function test_clickHandler(event:MouseEvent):void
+			{
+				var col : Number = Number(startCol.text);
+				var row : Number = Number(startRow.text);
+				var level : Number = Number(_mapLevel.text);
+				var dd:Array = GisUtil.getCenterLngLatOfGridandZooms(col,row,level);
+				LogManager.getInstance().onLogMessage("当前点坐标，经度："+dd[0]+"   纬度："+dd[1]);
+			}
+			
+			protected function test2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var lat : Number = Number(startCol.text);  //列 
+				var lon : Number = Number(startRow.text);  //行
+				var level : Number = Number(_mapLevel.text); //级别
+				var dd : Array = GisUtil.getGridsOfZooms(lon,lat,level);
+				LogManager.getInstance().onLogMessage("当前点行列，列："+dd[0]+"   行："+dd[1]);
+			}
+			
+			private var _blocks : Number;
+
+			public function get blocks():Number
+			{
+				return _blocks;
+			}
+
+			public function set blocks(value:Number):void
+			{
+				_blocks = value;
+				if( blocks > 0 ){
+					createImages();
+				}
+			}
+			private var imageArr : Array;
+			private function createImages():void{
+				var sqrt : Number = Math.sqrt(blocks);
+				var singleMargin : Number = 256/sqrt;
+				imageArr = new Array();
+				for( var i :int = 0;i < sqrt;i++ ){
+					for( var j : int = 0;j < sqrt;j++ ){
+						var image : Image = new Image();
+						image.x = 0 + j * singleMargin;
+						image.y = 0 + i * singleMargin;
+						image.width = image.height = singleMargin;
+						imageArea.addChild(image);
+						imageArr.push(image);
+					}
+				}
+				myArcGis.imageArr = imageArr;
+				myArcGis.addEventListener("dividedSaveSuccessed",dividedSaveSuccessedFun);
+			}
+			private function dividedSaveSuccessedFun(e:Event):void{
+				setTimeout(setImage,3000);
+			}
+			
+			private function setImage():void{
+				FileManager.getInstance().saveImage(imageArea,0,0);
+				for each(var item : Image in imageArr){
+					item.source = null;
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:layout>
+		<s:VerticalLayout paddingLeft="20"/>
+	</s:layout>
+	<s:HGroup width="100%" height="30" verticalAlign="middle">
+		<s:Label text="开始列:"/>
+		<s:TextInput id="startCol" restrict="0-9."/>
+		<s:Label text="开始行:"/>
+		<s:TextInput id="startRow" restrict="0-9."/>
+		<s:Label text="地图级别:"/>
+		<s:TextInput  text="7" id="_mapLevel" restrict="0-9"/>
+		<s:Button label="开始抓图" id="allBorder" click="drawGis()"/>
+<!--		<s:Button label="暂停" id="_stopBtn"  click="onStop()"/>-->
+<!--		<s:Button label="计算点坐标" id="test" click="test_clickHandler(event)"/>
+		<s:Button label="计算行列" id="test2" click="test2_clickHandler(event)"/>-->
+<!--		<s:Button label="铁路" id="onlyRoad" click="onlyRoad_clickHandler(event)"/>
+		<s:Button label="省界" id="onlyBorder" click="onlyBorder_clickHandler(event)"/>-->
+	</s:HGroup>
+	<s:BorderContainer width="100%" height="100%" borderColor="0x000000">
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		<mx:Canvas id="_myCanvas" width="1024" height="1024" borderStyle="none">
+			<arcGis:ArcGisMap id="myArcGis" width="1024" height="1024"    mapClick="onMapClick(event)"  panEnd="onPanEnd(event)">
+				
+			</arcGis:ArcGisMap>
+		</mx:Canvas>
+		<mx:TextArea width="400" height="100%" id="_logTextArea" fontFamily="宋体"  fontSize="14"/>
+		<mx:Canvas id="imageArea" width="256" height="256"/>
+	</s:BorderContainer>
+	
+</s:WindowedApplication>

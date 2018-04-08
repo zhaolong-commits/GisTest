@@ -1,0 +1,38 @@
+<levels>
+	<level id="4" block="64" lpos="0.1" rpos="0.1" tpos="0.5" bpos="0.1" >
+		<area col="11" row="6"></area>
+		<area col="12" row="6"></area>
+		<area col="12" row="7"></area>
+		<area col="13" row="6"></area>
+		<area col="13" row="5"></area>
+	</level>
+	<level id="5" block="16" lpos="0.15" rpos="0.15" tpos="0.2" bpos="0.1">
+		<area col="24" row="12"></area>
+		<area col="24" row="13"></area>
+		<area col="25" row="12"></area>
+		<area col="25" row="13"></area>
+		<area col="25" row="14"></area>
+		<area col="26" row="12"></area>
+		<area col="26" row="13"></area>
+	</level>
+	<level id="6" block="4" lpos="0.2" rpos="0.2" tpos="0.25" bpos="0.2"> 
+		<area col="50" row="26"></area>
+		<area col="50" row="27"></area>
+		<area col="51" row="26"></area>
+		<area col="51" row="27"></area>
+		<area col="51" row="28"></area>
+	</level>
+</levels>
+<!-- 
+	这个文件是用来配置数据过大导致不能画出来的图片区域（col，row）。
+	block : 属性，是用来把这块区域分为多少块。建议使用 4,16,64这种具有平方根且是256的因数的数字。（截图每块的区域是256*256）
+	如果实在想设置其他数字的话，可以设置成9,25,36... 81， 100等。因为需要计算坐标。设置这些数字可能会产生不可预知的坐标差值。
+	
+	对图片进行分切加载时，因为对经纬处理可能会使正在切割线上的坐标点无法加载上来。这里需要进行一些补偿性扩大。由于不同级别下计算经纬度产生的偏差
+	不同，这里提供可配置。(有时候可能会因为0.1经纬度的偏差导致加载的数据大量上涨甚至翻倍。这里的偏移的设置尽量满足需求，又不会导致资源浪费。)
+	lpos : 向左偏移值
+	rpos : 向右偏移值
+	tpos : 向上偏移值
+	bpos : 向下偏移值
+    area 块就是设置行，列的位置。尽量在每个level（等级）下设置。
+ -->

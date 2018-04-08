@@ -1,0 +1,12 @@
+#背景图
+#baseMap=D:\map\baseMap
+#最后生成的图片路径
+destination=D:
+#生成的文件
+basePath=testProvin
+#服务地址
+#endPoint=rtmp://192.168.1.228/lookup
+
+#endPoint=rtmp://192.168.1.227/lookup
+
+endPoint=rtmp://192.168.1.219/lookup

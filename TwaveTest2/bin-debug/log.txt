@@ -1,0 +1,175 @@
+rtmp连接成功
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+NetConnection.Connect.Success
+rtmp连接成功
+转换级别为:7,经纬度为:61.606396371386275,  42.1875
+beginCol=79,beginRow=36,endCol=112,endRow=58,currentCol=79,currentRow=36
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\79\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=39.375000005481276,endLon=50.62500000704431
+pan col=312, row=151
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\80\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=42.187500005872025,endLon=53.437500007435055
+pan col=316, row=151
+url参数:rtmp://192.168.1.219/lookup
+rtmp连接地址为:rtmp://192.168.1.219/lookup
+NetConnection.Connect.Success
+rtmp连接成功
+转换级别为:7,经纬度为:61.606396371386275,  42.1875
+beginCol=79,beginRow=36,endCol=112,endRow=58,currentCol=79,currentRow=36
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\79\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=39.37500000548127,endLon=50.62500000704429
+pan col=312, row=151
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\80\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=42.18750000587201,endLon=53.437500007435034
+pan col=316, row=151
+当前区域开始的坐标点：47.8125,61.606396371386275
+当前区域结束的坐标点:50.625,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:47.6125,50.825,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：47.8125,61.606396371386275
+当前区域结束的坐标点:50.625,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:47.6125,50.825,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:47.6125,50.825,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:47.6125,50.825,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\81\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=45.00000000626276,endLon=56.25000000782579
+pan col=320, row=151
+当前区域开始的坐标点：50.625,61.606396371386275
+当前区域结束的坐标点:53.4375,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:50.425,53.6375,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：50.625,61.606396371386275
+当前区域结束的坐标点:53.4375,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:50.425,53.6375,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:50.425,53.6375,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+NetConnection.Connect.Success
+rtmp连接成功
+转换级别为:7,经纬度为:61.606396371386275,  42.1875
+beginCol=79,beginRow=36,endCol=112,endRow=58,currentCol=79,currentRow=36
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\79\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=39.375000005481276,endLon=50.62500000704431
+pan col=312, row=151
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：45,61.606396371386275
+当前区域结束的坐标点:47.8125,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:44.8,48.0125,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\80\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=42.18750000587201,endLon=53.43750000743504
+pan col=316, row=151
+当前区域开始的坐标点：47.8125,61.606396371386275
+当前区域结束的坐标点:50.625,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:47.6125,50.825,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：47.8125,61.606396371386275
+当前区域结束的坐标点:50.625,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:47.6125,50.825,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:47.6125,50.825,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:47.6125,50.825,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\81\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=45.00000000626278,endLon=56.25000000782581
+pan col=320, row=151
+当前区域开始的坐标点：50.625,61.606396371386275
+当前区域结束的坐标点:53.4375,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:50.425,53.6375,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：50.625,61.606396371386275
+当前区域结束的坐标点:53.4375,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:50.425,53.6375,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:50.425,53.6375,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:50.425,53.6375,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+保存的图片为:D:\mapImages\7\82\36.jpg
+清理当前区域的边界，道路完成！！
+pan completd ====,beginLat=58.81374173136009,endLat=64.16810691184352,beginLon=47.81250000665355,endLon=59.062500008216574
+pan col=324, row=151
+当前区域开始的坐标点：53.4375,61.606396371386275
+当前区域结束的坐标点:56.25,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:53.2375,56.45,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：53.4375,61.606396371386275
+当前区域结束的坐标点:56.25,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:53.2375,56.45,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:53.2375,56.45,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:53.2375,56.45,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
+NetConnection.Connect.Success
+rtmp连接成功
+转换级别为:7,经纬度为:61.606396371386275,  42.1875
+beginCol=79,beginRow=36,endCol=112,endRow=58,currentCol=79,currentRow=36
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628
+当前区域开始的坐标点：42.1875,61.606396371386275
+当前区域结束的坐标点:45,60.239811169998916
+execute RTMPRPC pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628
+RTMPRPC Result pkg:GisCoordinateService, method:getRailwayLineInMaxMinCoordinate, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+查询的区域没有铁路线！
+RTMPRPC Result pkg:GisCoordinateService, method:getAreaRangeProvincePolygonPoints, args:41.9875,45.2,60.03981116999891,61.80639637138628,    result:RTMPRpcManager
+当前区域没有边界线
